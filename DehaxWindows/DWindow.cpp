@@ -1,14 +1,19 @@
 #include "stdafx.h"
 #include "DWindow.h"
 
-DWindow::DWindow(HINSTANCE hInstance, HICON hIcon, HCURSOR hCursor, HBRUSH hBackgroundBrush, LPCWSTR lpszMenuName, LPCWSTR lpszClassName, HICON hIconSmall)
+DWindow::DWindow(HINSTANCE hInstance, HICON hIcon, HICON hIconSmall, HCURSOR hCursor, HBRUSH hBackgroundBrush, LPCWSTR lpszMenuName, LPCWSTR lpszClassName, LPCWSTR lpszTitle)
+	: m_hInstance(hInstance), m_hIcon(hIcon), m_hIconSmall(hIconSmall), m_hCursor(hCursor), m_hBackgroundBrush(hBackgroundBrush), m_lpszMenuName(lpszMenuName), m_lpszClassName(lpszClassName), m_lpszTitle(lpszTitle)
 {
 	RegisterWindowClass();
+
+	m_hWnd = CreateWindowExW(0L, m_lpszClassName, m_lpszTitle, WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, m_hInstance, nullptr);
 }
 
-void DWindow::setUpdateProcedure(DWindowUpdate updateProcedure)
+void DWindow::Show(int nCmdShow)
 {
-	m_updateProcedure = updateProcedure;
+	ShowWindow(m_hWnd, nCmdShow);
+	UpdateWindow(m_hWnd);
 }
 
 ATOM DWindow::RegisterWindowClass()
