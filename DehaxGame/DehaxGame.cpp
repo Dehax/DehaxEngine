@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "DehaxGame.h"
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR lpCmdLine,
-	_In_ int nCmdShow
-)
+DehaxEngine *dehaxEngine;
+
+void Update()
+{
+	dehaxEngine->Render();
+}
+
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -18,7 +21,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAcceleratorsW(hInstance, MAKEINTRESOURCEW(IDC_DEHAXGAME));
 
 	DApplication application;
-	DWindow window = DWindow(hInstance,
+	DWindow window = DWindow(hInstance, 0, 0, 800, 600,
 		LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_DEHAXGAME)),
 		LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_SMALL)),
 		LoadCursorW(nullptr, IDC_ARROW),
@@ -28,8 +31,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		szTitle);
 	window.Show(nCmdShow);
 
-	DWindow window2(hInstance, NULL, NULL, NULL, NULL, NULL, L"DehaxWindow", L"My Dehax Window");
-	window2.Show(nCmdShow);
-	
-	return application.Run();
+	application.setUpdateHandler(Update);
+
+	dehaxEngine = new DehaxEngine(window.getHandle());
+
+	int resultCode = application.Run();
+
+	delete dehaxEngine;
+
+	return resultCode;
 }

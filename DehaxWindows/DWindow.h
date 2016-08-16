@@ -4,8 +4,11 @@
 
 class DEHAXWINDOWS_API DWindow {
 public:
-	DWindow(HINSTANCE hInstance, HICON hIcon, HICON hIconSmall, HCURSOR hCursor, HBRUSH hBackgroundBrush, LPCWSTR lpszMenuName, LPCWSTR lpszClassName, LPCWSTR lpszTitle);
+	DWindow(HINSTANCE hInstance, int x, int y, int width, int height, HICON hIcon, HICON hIconSmall, HCURSOR hCursor, HBRUSH hBackgroundBrush, LPCWSTR lpszMenuName, LPCWSTR lpszClassName, LPCWSTR lpszTitle);
 	void Show(int nCmdShow);
+
+	HWND getHandle() const;
+	LPCWSTR getTitle() const;
 private:
 	ATOM RegisterWindowClass();
 	static LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

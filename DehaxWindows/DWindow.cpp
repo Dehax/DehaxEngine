@@ -1,19 +1,32 @@
 #include "stdafx.h"
 #include "DWindow.h"
 
-DWindow::DWindow(HINSTANCE hInstance, HICON hIcon, HICON hIconSmall, HCURSOR hCursor, HBRUSH hBackgroundBrush, LPCWSTR lpszMenuName, LPCWSTR lpszClassName, LPCWSTR lpszTitle)
+DWindow::DWindow(HINSTANCE hInstance, int x, int y, int width, int height, HICON hIcon, HICON hIconSmall, HCURSOR hCursor, HBRUSH hBackgroundBrush, LPCWSTR lpszMenuName, LPCWSTR lpszClassName, LPCWSTR lpszTitle)
 	: m_hInstance(hInstance), m_hIcon(hIcon), m_hIconSmall(hIconSmall), m_hCursor(hCursor), m_hBackgroundBrush(hBackgroundBrush), m_lpszMenuName(lpszMenuName), m_lpszClassName(lpszClassName), m_lpszTitle(lpszTitle)
 {
 	RegisterWindowClass();
 
+	RECT rc = { 0, 0, width, height };
+	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, m_lpszMenuName != nullptr);
+
 	m_hWnd = CreateWindowExW(0L, m_lpszClassName, m_lpszTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, m_hInstance, nullptr);
+		x, y, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, m_hInstance, nullptr);
 }
 
 void DWindow::Show(int nCmdShow)
 {
 	ShowWindow(m_hWnd, nCmdShow);
 	UpdateWindow(m_hWnd);
+}
+
+HWND DWindow::getHandle() const
+{
+	return m_hWnd;
+}
+
+LPCWSTR DWindow::getTitle() const
+{
+	return m_lpszTitle;
 }
 
 ATOM DWindow::RegisterWindowClass()
