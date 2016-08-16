@@ -13,6 +13,22 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Заголовочные файлы\Models">
+      <UniqueIdentifier>{9d169a2e-856c-4246-aab6-5f11986e4a64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Scenes">
+      <UniqueIdentifier>{ec116b25-9789-4f0f-b489-1625d374168b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\Models">
+      <UniqueIdentifier>{40d84aba-37b5-4f55-9df6-5d0aabe41598}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\Scenes">
+      <UniqueIdentifier>{38631fb3-4f8a-4d4a-9411-064f4d858441}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{c785228e-62b7-49b9-b5b8-bf46b44b5a40}</UniqueIdentifier>
+      <Extensions>hlsl;fx</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -23,6 +39,15 @@
     </ClInclude>
     <ClInclude Include="DehaxEngine.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\Model.h">
+      <Filter>Заголовочные файлы\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\Vertex.h">
+      <Filter>Заголовочные файлы\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\Mesh.h">
+      <Filter>Заголовочные файлы\Models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -35,5 +60,19 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="Models\Model.cpp">
+      <Filter>Файлы исходного кода\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Models\Vertex.cpp">
+      <Filter>Файлы исходного кода\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Models\Mesh.cpp">
+      <Filter>Файлы исходного кода\Models</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\SimpleColor.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "DehaxGame.h"
 
+#include <Models\Mesh.h>
+
 DehaxEngine *dehaxEngine;
 
 void Update()
@@ -34,6 +36,32 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	application.setUpdateHandler(Update);
 
 	dehaxEngine = new DehaxEngine(window.getHandle());
+
+	Mesh *mesh = new Mesh();
+	mesh->AddVertex(Vertex(-1.0f, 1.0f, -1.0f));
+	mesh->AddVertex(Vertex(1.0f, 1.0f, -1.0f));
+	mesh->AddVertex(Vertex(1.0f, 1.0f, 1.0f));
+	mesh->AddVertex(Vertex(-1.0f, 1.0f, 1.0f));
+	mesh->AddVertex(Vertex(-1.0f, -1.0f, -1.0f));
+	mesh->AddVertex(Vertex(1.0f, -1.0f, -1.0f));
+	mesh->AddVertex(Vertex(1.0f, -1.0f, 1.0f));
+	mesh->AddVertex(Vertex(-1.0f, -1.0f, 1.0f));
+	mesh->AddFace(DirectX::XMUINT3(3, 1, 0));
+	mesh->AddFace(DirectX::XMUINT3(2, 1, 3));
+	mesh->AddFace(DirectX::XMUINT3(0, 5, 4));
+	mesh->AddFace(DirectX::XMUINT3(1, 5, 0));
+	mesh->AddFace(DirectX::XMUINT3(3, 4, 7));
+	mesh->AddFace(DirectX::XMUINT3(0, 4, 3));
+	mesh->AddFace(DirectX::XMUINT3(1, 6, 5));
+	mesh->AddFace(DirectX::XMUINT3(2, 6, 1));
+	mesh->AddFace(DirectX::XMUINT3(2, 7, 6));
+	mesh->AddFace(DirectX::XMUINT3(3, 7, 2));
+	mesh->AddFace(DirectX::XMUINT3(6, 4, 5));
+	mesh->AddFace(DirectX::XMUINT3(7, 4, 6));
+	Model *model = new Model("DehaxModel", mesh, DirectX::Colors::Black);
+
+	dehaxEngine->setModel(model);
+	dehaxEngine->InitDevice();
 
 	int resultCode = application.Run();
 

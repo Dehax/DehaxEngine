@@ -4,7 +4,6 @@
 DehaxEngine::DehaxEngine(HWND hWnd)
 	: m_hWnd(hWnd)
 {
-	InitDevice();
 }
 
 HRESULT DehaxEngine::InitDevice()
@@ -160,7 +159,7 @@ HRESULT DehaxEngine::InitDevice()
 
 	// Compile the vertex shader
 	ID3DBlob* pVSBlob = nullptr;
-	hr = CompileShaderFromFile(L"Shader.fx", "VS", "vs_4_0", &pVSBlob);
+	hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "VS", "vs_4_0", &pVSBlob);
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
@@ -196,7 +195,7 @@ HRESULT DehaxEngine::InitDevice()
 
 	// Compile the pixel shader
 	ID3DBlob* pPSBlob = nullptr;
-	hr = CompileShaderFromFile(L"Shader.fx", "PS", "ps_4_0", &pPSBlob);
+	hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "PS", "ps_4_0", &pPSBlob);
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
@@ -222,6 +221,26 @@ HRESULT DehaxEngine::InitDevice()
 		{ DirectX::XMFLOAT3(1.0f, -1.0f, 1.0f),   DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
 		{ DirectX::XMFLOAT3(-1.0f, -1.0f, 1.0f),  DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) },
 	};
+	std::vector<SimpleVertex> verticesArray;
+	verticesArray.push_back(vertices[0]);
+	verticesArray.push_back(vertices[1]);
+	verticesArray.push_back(vertices[2]);
+	verticesArray.push_back(vertices[3]);
+	verticesArray.push_back(vertices[4]);
+	verticesArray.push_back(vertices[5]);
+	verticesArray.push_back(vertices[6]);
+	verticesArray.push_back(vertices[7]);
+
+	if (m_model != nullptr) {
+		Mesh *mesh = m_model->getMesh();
+		
+		for (int i = 0; i < mesh->getNumVertices(); i++) {
+			Vertex vertex = mesh->getVertex(i);
+			SimpleVertex simpleVertex = { vertex.getPosition(), DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
+			verticesArray.push_back(simpleVertex);
+		}
+	}
+
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
@@ -230,7 +249,7 @@ HRESULT DehaxEngine::InitDevice()
 	bd.CPUAccessFlags = 0;
 	D3D11_SUBRESOURCE_DATA InitData;
 	ZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = vertices;
+	InitData.pSysMem = verticesArray.data();
 	hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pVertexBuffer);
 	if (FAILED(hr))
 		return hr;
@@ -261,11 +280,23 @@ HRESULT DehaxEngine::InitDevice()
 		6,4,5,
 		7,4,6,
 	};
+	std::vector<WORD> indicesArray;
+	
+	if (m_model != nullptr) {
+		Mesh *mesh = m_model->getMesh();
+		for (int i = 0; i < mesh->getNumFaces(); i++) {
+			DirectX::XMUINT3 face = mesh->getFace(i);
+			indicesArray.push_back(face.x);
+			indicesArray.push_back(face.y);
+			indicesArray.push_back(face.z);
+		}
+	}
+
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.ByteWidth = sizeof(WORD) * 36;        // 36 vertices needed for 12 triangles in a triangle list
 	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bd.CPUAccessFlags = 0;
-	InitData.pSysMem = indices;
+	InitData.pSysMem = indicesArray.data();
 	hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pIndexBuffer);
 	if (FAILED(hr))
 		return hr;
@@ -290,8 +321,8 @@ HRESULT DehaxEngine::InitDevice()
 
 	// Initialize the view matrix
 	DirectX::XMVECTOR Eye = DirectX::XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
-	DirectX::XMVECTOR At =  DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	DirectX::XMVECTOR Up =  DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR At = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR Up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_View = DirectX::XMMatrixLookAtLH(Eye, At, Up);
 
 	// Initialize the projection matrix
