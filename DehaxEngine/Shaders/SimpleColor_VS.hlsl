@@ -4,7 +4,7 @@ cbuffer ConstantBuffer : register(b0)
 	matrix View;
 	matrix Projection;
 	float4 vLightDir;
-	float4 vLightColor;
+	float4 modelColor;
 }
 
 struct VS_INPUT
@@ -28,12 +28,4 @@ PS_INPUT VS(VS_INPUT input)
 	output.Norm = mul(float4(input.Norm, 1), World).xyz;
 
 	return output;
-}
-
-float4 PS(PS_INPUT input) : SV_Target
-{
-	float4 finalColor = saturate(dot((float3)vLightDir, input.Norm) * vLightColor);
-	finalColor.a = 1;
-
-	return finalColor;
 }

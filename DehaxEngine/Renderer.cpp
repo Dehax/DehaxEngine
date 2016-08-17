@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 
+#include <fstream>
 #include "DehaxEngine.h"
 
 Renderer::Renderer(DehaxEngine *engine)
@@ -193,19 +194,28 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	m_pImmediateContext->RSSetViewports(1, &vp);
 
 	// Compile the vertex shader
-	ID3DBlob* pVSBlob = nullptr;
-	hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "VS", "vs_4_0", &pVSBlob);
-	if (FAILED(hr))
-	{
+	//ID3DBlob* pVSBlob = nullptr;
+	//hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "VS", "vs_4_0", &pVSBlob);
+	//if (FAILED(hr))
+	//{
+	//	MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+	//	return hr;
+	//}
+
+	char *pVSBlob = nullptr;
+	size_t VSSize;
+	bool result = LoadShaderFromFile(L"SimpleColor_VS.cso", &pVSBlob, VSSize);
+	if (!result) {
 		MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
-		return hr;
+		return S_FALSE;
 	}
 
 	// Create the vertex shader
-	hr = m_pd3dDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &m_pVertexShader);
+	hr = m_pd3dDevice->CreateVertexShader(pVSBlob/*->GetBufferPointer()*/, VSSize/*pVSBlob->GetBufferSize()*/, nullptr, &m_pVertexShader);
 	if (FAILED(hr))
 	{
-		pVSBlob->Release();
+		//pVSBlob->Release();
+		delete[] pVSBlob;
 		return hr;
 	}
 
@@ -218,8 +228,9 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	UINT numElements = ARRAYSIZE(layout);
 
 	// Create the input layout
-	hr = m_pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), &m_pVertexLayout);
-	pVSBlob->Release();
+	hr = m_pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob/*->GetBufferPointer()*/, /*pVSBlob->GetBufferSize()*/VSSize, &m_pVertexLayout);
+	//pVSBlob->Release();
+	delete[] pVSBlob;
 	if (FAILED(hr))
 		return hr;
 
@@ -227,17 +238,25 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	m_pImmediateContext->IASetInputLayout(m_pVertexLayout);
 
 	// Compile the pixel shader
-	ID3DBlob* pPSBlob = nullptr;
-	hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "PS", "ps_4_0", &pPSBlob);
-	if (FAILED(hr))
-	{
+	//ID3DBlob* pPSBlob = nullptr;
+	//hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "PS", "ps_4_0", &pPSBlob);
+	//if (FAILED(hr))
+	//{
+	//	MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+	//	return hr;
+	//}
+	char *pPSBlob = nullptr;
+	size_t PSSize;
+	result = LoadShaderFromFile(L"SimpleColor_PS.cso", &pPSBlob, PSSize);
+	if (!result) {
 		MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
-		return hr;
+		return S_FALSE;
 	}
 
 	// Create the pixel shader
-	hr = m_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &m_pPixelShader);
-	pPSBlob->Release();
+	hr = m_pd3dDevice->CreatePixelShader(pPSBlob/*->GetBufferPointer()*/, /*pPSBlob->GetBufferSize()*/PSSize, nullptr, &m_pPixelShader);
+	/*pPSBlob->Release();*/
+	delete[] pPSBlob;
 	if (FAILED(hr))
 		return hr;
 
@@ -346,7 +365,7 @@ void Renderer::Render()
 		m_pImmediateContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 		m_pIndexBuffer->Release();
-		
+
 		ConstantBuffer cb;
 		cb.mWorld = DirectX::XMMatrixTranspose(model->getWorldMatrix());
 		//cb.mWorld = DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(t));
@@ -354,7 +373,7 @@ void Renderer::Render()
 		cb.mProjection = DirectX::XMMatrixTranspose(m_Projection);
 		cb.vLightDir = DirectX::XMFLOAT4(0.5f, 0.5f, -1.0f, 1.0f);
 		cb.vLightColor = DirectX::XMFLOAT4(model->getColor().f);
-		
+
 		m_pImmediateContext->UpdateSubresource(m_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
 		m_pImmediateContext->VSSetShader(m_pVertexShader, nullptr, 0);
@@ -369,36 +388,22 @@ void Renderer::Render()
 	m_pSwapChain->Present(0, 0);
 }
 
-HRESULT Renderer::CompileShaderFromFile(LPCWSTR szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob **ppBlobOut)
+bool Renderer::LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size)
 {
-	HRESULT hr = S_OK;
+	bool result = true;
 
-	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
-#ifdef _DEBUG
-	// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
-	// Setting this flag improves the shader debugging experience, but still allows 
-	// the shaders to be optimized and to run exactly the way they will run in 
-	// the release configuration of this program.
-	dwShaderFlags |= D3DCOMPILE_DEBUG;
-
-	// Disable optimizations to further improve shader debugging
-	dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-
-	ID3DBlob* pErrorBlob = nullptr;
-	hr = D3DCompileFromFile(szFileName, nullptr, nullptr, szEntryPoint, szShaderModel, dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
-	if (FAILED(hr))
-	{
-		if (pErrorBlob)
-		{
-			OutputDebugStringA(reinterpret_cast<const char*>(pErrorBlob->GetBufferPointer()));
-			pErrorBlob->Release();
-		}
-		return hr;
+	std::ifstream shader_file(lpszFilePath, std::ios::in | std::ios::binary | std::ios::ate);
+	if (shader_file.good()) {
+		size = shader_file.tellg();
+		*ppBlobOut = new char[size];
+		shader_file.seekg(0);
+		shader_file.read(*ppBlobOut, size);
 	}
-	if (pErrorBlob) pErrorBlob->Release();
+	else {
+		result = false;
+	}
 
-	return S_OK;
+	return result;
 }
 
 void Renderer::CleanupDevice()

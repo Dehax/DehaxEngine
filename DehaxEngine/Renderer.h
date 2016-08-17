@@ -26,7 +26,7 @@ private:
 		DirectX::XMFLOAT4 vLightColor;
 	};
 
-	HRESULT CompileShaderFromFile(LPCWSTR szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob **ppBlobOut);
+	bool LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size);
 	void CleanupDevice();
 
 	DehaxEngine *m_engine;
