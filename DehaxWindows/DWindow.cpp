@@ -10,7 +10,7 @@ DWindow::DWindow(HINSTANCE hInstance, int x, int y, int width, int height, HICON
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, m_lpszMenuName != nullptr);
 
 	m_hWnd = CreateWindowExW(0L, m_lpszClassName, m_lpszTitle, WS_OVERLAPPEDWINDOW,
-		x, y, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, m_hInstance, nullptr);
+		x, y, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, m_hInstance, this);
 }
 
 void DWindow::Show(int nCmdShow)
@@ -29,6 +29,11 @@ LPCWSTR DWindow::getTitle() const
 	return m_lpszTitle;
 }
 
+void DWindow::setKeyDownHandler(KeyDownHandler keyDownHandler)
+{
+	m_keyDownHandler = keyDownHandler;
+}
+
 ATOM DWindow::RegisterWindowClass()
 {
 	WNDCLASSEXW wcex;
@@ -36,7 +41,7 @@ ATOM DWindow::RegisterWindowClass()
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WindowProcedure;
+	wcex.lpfnWndProc = StaticWindowProcedure;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = m_hInstance;
@@ -50,6 +55,29 @@ ATOM DWindow::RegisterWindowClass()
 	return RegisterClassExW(&wcex);
 }
 
+LRESULT DWindow::StaticWindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	LONG dwNewLong;
+	DWindow *pWin;
+
+	if (message == WM_NCCREATE)
+	{
+		dwNewLong = (long)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+		SetWindowLongW(hWnd, GWL_USERDATA, dwNewLong);
+		return TRUE;
+	}
+	else
+	{
+		pWin = (DWindow *)GetWindowLongW(hWnd, GWL_USERDATA);
+	}
+
+	if (pWin) {
+		return pWin->WindowProcedure(hWnd, message, wParam, lParam);
+	}
+
+	return 0;
+}
+
 LRESULT DWindow::WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -59,6 +87,13 @@ LRESULT DWindow::WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 		EndPaint(hWnd, &ps);
+	}
+	break;
+	case WM_KEYDOWN:
+	{
+		if (m_keyDownHandler != nullptr) {
+			m_keyDownHandler(wParam);
+		}
 	}
 	break;
 	case WM_DESTROY:

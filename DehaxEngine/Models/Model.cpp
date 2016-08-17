@@ -25,7 +25,7 @@ Model::Model(const Model &model)
 	m_name = model.m_name;
 }
 
-Model::Model(const char *name, Mesh *mesh, const DirectX::XMVECTORF32 &color)
+Model::Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color)
 	: m_mesh(mesh), m_color(color), m_name(name)
 {
 	m_position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -99,7 +99,7 @@ Mesh *Model::getMesh()
 	return m_mesh;
 }
 
-DirectX::XMMATRIX Model::worldMatrix()
+DirectX::XMMATRIX Model::getWorldMatrix()
 {
 	DirectX::XMMATRIX P = m_pivotMatrix;
 	DirectX::XMMATRIX R = m_rotateMatrix;
@@ -110,12 +110,12 @@ DirectX::XMMATRIX Model::worldMatrix()
 	return P * R * S * PI * T;
 }
 
-const char *Model::getName() const
+LPCWSTR Model::getName() const
 {
 	return m_name;
 }
 
-void Model::setName(const char *name)
+void Model::setName(LPCWSTR name)
 {
 	m_name = name;
 }

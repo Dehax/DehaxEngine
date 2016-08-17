@@ -49,6 +49,15 @@
     <ClInclude Include="Models\Mesh.h">
       <Filter>Заголовочные файлы\Models</Filter>
     </ClInclude>
+    <ClInclude Include="Scenes\Scene.h">
+      <Filter>Заголовочные файлы\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\ModelsFactory.h">
+      <Filter>Заголовочные файлы\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -68,6 +77,15 @@
     </ClCompile>
     <ClCompile Include="Models\Mesh.cpp">
       <Filter>Файлы исходного кода\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Scenes\Scene.cpp">
+      <Filter>Файлы исходного кода\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Models\ModelsFactory.cpp">
+      <Filter>Файлы исходного кода\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

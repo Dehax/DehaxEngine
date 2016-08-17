@@ -7,9 +7,9 @@
 
 class DEHAXENGINE_API Model {
 public:
-	explicit Model();
-	explicit Model(const Model &model);
-	explicit Model(const char *name, Mesh *mesh, const DirectX::XMVECTORF32 &color);
+	Model();
+	Model(const Model &model);
+	Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color);
 	~Model();
 
 	DirectX::XMFLOAT3 getPosition() const;
@@ -22,10 +22,10 @@ public:
 	void setPivot(DirectX::XMFLOAT3 pivot);
 	Mesh *getMesh();
 
-	DirectX::XMMATRIX worldMatrix();
+	DirectX::XMMATRIX getWorldMatrix();
 
-	const char *getName() const;
-	void setName(const char *name);
+	LPCWSTR getName() const;
+	void setName(LPCWSTR name);
 	DirectX::XMVECTORF32 getColor() const;
 	void setColor(const DirectX::XMVECTORF32 &color);
 
@@ -46,5 +46,5 @@ private:
 	DirectX::XMMATRIX m_pivotMatrix;
 	DirectX::XMMATRIX m_pivotInverseMatrix;
 
-	const char *m_name;
+	LPCWSTR m_name;
 };

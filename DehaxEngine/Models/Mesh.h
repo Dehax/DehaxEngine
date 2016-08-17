@@ -7,14 +7,14 @@
 
 class DEHAXENGINE_API Mesh {
 public:
-	explicit Mesh();
-	explicit Mesh(const Mesh &mesh);
+	Mesh();
+	Mesh(const Mesh &mesh);
 
-	int getNumVertices() const;
-	int getNumFaces() const;
+	unsigned int getNumVertices() const;
+	unsigned int getNumFaces() const;
 	
-	Vertex getVertex(const int index) const;
-	DirectX::XMUINT3 getFace(const int index) const;
+	Vertex &getVertex(const unsigned int index);
+	DirectX::XMUINT3 &getFace(const unsigned int index);
 
 	void AddVertex(const Vertex &vertex);
 	void AddFace(const DirectX::XMUINT3 &face);

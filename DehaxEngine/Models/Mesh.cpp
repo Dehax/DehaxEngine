@@ -11,22 +11,22 @@ Mesh::Mesh(const Mesh &mesh)
 	m_faces = mesh.m_faces;
 }
 
-int Mesh::getNumVertices() const
+unsigned int Mesh::getNumVertices() const
 {
 	return m_vertices.size();
 }
 
-int Mesh::getNumFaces() const
+unsigned int Mesh::getNumFaces() const
 {
 	return m_faces.size();
 }
 
-Vertex Mesh::getVertex(const int index) const
+Vertex &Mesh::getVertex(const unsigned int index)
 {
 	return m_vertices[index];
 }
 
-DirectX::XMUINT3 Mesh::getFace(const int index) const
+DirectX::XMUINT3 &Mesh::getFace(const unsigned int index)
 {
 	return m_faces[index];
 }
