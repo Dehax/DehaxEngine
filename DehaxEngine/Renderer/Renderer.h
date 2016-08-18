@@ -1,5 +1,7 @@
 #pragma once
-#include "stdafx.h"
+#include "..\stdafx.h"
+
+#include "Camera.h"
 
 class DehaxEngine;
 
@@ -10,6 +12,8 @@ public:
 
 	HRESULT InitDevice(HWND hWnd);
 	void Render();
+
+	Camera *getCamera() const;
 private:
 	struct SimpleVertex
 	{
@@ -29,7 +33,8 @@ private:
 	bool LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size);
 	void CleanupDevice();
 
-	DehaxEngine *m_engine;
+	DehaxEngine *m_engine = nullptr;
+	Camera *m_camera = nullptr;
 
 	HINSTANCE				m_hInst = nullptr;
 	D3D_DRIVER_TYPE			m_driverType = D3D_DRIVER_TYPE_NULL;
@@ -49,6 +54,4 @@ private:
 	ID3D11Buffer*			m_pVertexBuffer = nullptr;
 	ID3D11Buffer*			m_pIndexBuffer = nullptr;
 	ID3D11Buffer*			m_pConstantBuffer = nullptr;
-	DirectX::XMMATRIX		m_View;
-	DirectX::XMMATRIX		m_Projection;
 };

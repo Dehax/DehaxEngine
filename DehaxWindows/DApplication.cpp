@@ -12,7 +12,7 @@ int DApplication::Run()
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
-			if (m_hAccelTable != nullptr && !TranslateAcceleratorW(msg.hwnd, m_hAccelTable, &msg))
+			if (m_hAccelTable == nullptr || !TranslateAcceleratorW(msg.hwnd, m_hAccelTable, &msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessageW(&msg);

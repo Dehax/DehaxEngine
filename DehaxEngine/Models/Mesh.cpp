@@ -13,12 +13,12 @@ Mesh::Mesh(const Mesh &mesh)
 
 unsigned int Mesh::getNumVertices() const
 {
-	return m_vertices.size();
+	return (unsigned int)m_vertices.size();
 }
 
 unsigned int Mesh::getNumFaces() const
 {
-	return m_faces.size();
+	return (unsigned int)m_faces.size();
 }
 
 Vertex &Mesh::getVertex(const unsigned int index)

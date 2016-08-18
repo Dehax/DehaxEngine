@@ -76,7 +76,7 @@ Model ModelsFactory::Box(float width, float length, float height)
 //	vertices[vert++] = Vertex(0.0f, -height, 0.0f);
 //
 //	while (vert <= sides) {
-//		long double rad = (long double)vert / sides * DirectX::XM_2PI;
+//		float rad = (float)vert / sides * DirectX::XM_2PI;
 //		vertices[vert] = Vertex(std::cos(rad) * radius, -height, std::sin(rad) * radius);
 //		vert++;
 //	}
@@ -85,7 +85,7 @@ Model ModelsFactory::Box(float width, float length, float height)
 //	vertices[vert++] = Vertex(0.0L, height, 0.0L);
 //
 //	while (vert <= sides * 2 + 1) {
-//		long double rad = (long double)(vert - sides - 1) / sides * DirectX::XM_2PI;
+//		float rad = (float)(vert - sides - 1) / sides * DirectX::XM_2PI;
 //		vertices[vert] = Vertex(std::cos(rad) * radius, height, std::sin(rad) * radius);
 //		vert++;
 //	}

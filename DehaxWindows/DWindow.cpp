@@ -34,6 +34,11 @@ void DWindow::setKeyDownHandler(KeyDownHandler keyDownHandler)
 	m_keyDownHandler = keyDownHandler;
 }
 
+void DWindow::setWindowMessageHandler(WindowMessageHandler windowMessageHandler)
+{
+	m_windowMessageHandler = windowMessageHandler;
+}
+
 ATOM DWindow::RegisterWindowClass()
 {
 	WNDCLASSEXW wcex;
@@ -57,18 +62,18 @@ ATOM DWindow::RegisterWindowClass()
 
 LRESULT DWindow::StaticWindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	LONG dwNewLong;
+	LPVOID dwNewLong;
 	DWindow *pWin;
 
 	if (message == WM_NCCREATE)
 	{
-		dwNewLong = (long)(((LPCREATESTRUCT)lParam)->lpCreateParams);
-		SetWindowLongW(hWnd, GWL_USERDATA, dwNewLong);
+		dwNewLong = ((LPCREATESTRUCT)lParam)->lpCreateParams;
+		SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)dwNewLong);
 		return TRUE;
 	}
 	else
 	{
-		pWin = (DWindow *)GetWindowLongW(hWnd, GWL_USERDATA);
+		pWin = (DWindow *)GetWindowLongPtrW(hWnd, GWLP_USERDATA);
 	}
 
 	if (pWin) {
@@ -92,7 +97,7 @@ LRESULT DWindow::WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	case WM_KEYDOWN:
 	{
 		if (m_keyDownHandler != nullptr) {
-			m_keyDownHandler(wParam);
+			m_keyDownHandler((unsigned int)wParam);
 		}
 	}
 	break;
@@ -100,6 +105,10 @@ LRESULT DWindow::WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		PostQuitMessage(0);
 		break;
 	default:
+		if (m_windowMessageHandler) {
+			return m_windowMessageHandler(hWnd, message, wParam, lParam);
+		}
+
 		return DefWindowProcW(hWnd, message, wParam, lParam);
 	}
 

@@ -1,11 +1,11 @@
-#include "stdafx.h"
+#include "..\stdafx.h"
 #include "Renderer.h"
 
 #include <fstream>
-#include "DehaxEngine.h"
+#include "..\DehaxEngine.h"
 
 Renderer::Renderer(DehaxEngine *engine)
-	: m_engine(engine)
+	: m_engine(engine), m_camera(new Camera())
 {
 }
 
@@ -22,6 +22,9 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	GetClientRect(hWnd, &rc);
 	UINT width = rc.right - rc.left;
 	UINT height = rc.bottom - rc.top;
+
+	m_camera->setWidth(width);
+	m_camera->setHeight(height);
 
 	UINT createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -181,7 +184,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	if (FAILED(hr))
 		return hr;
 
-	m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, nullptr);
+	m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
@@ -260,14 +263,6 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	if (FAILED(hr))
 		return hr;
 
-	// Initialize the view matrix
-	DirectX::XMVECTOR Eye = DirectX::XMVectorSet(0.0f, 0.0f, -10.0f, 1.0f);
-	DirectX::XMVECTOR At = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-	DirectX::XMVECTOR Up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
-	m_View = DirectX::XMMatrixLookAtLH(Eye, At, Up);
-
-	m_Projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, width / (FLOAT)height, 0.01f, 100.0f);
-
 	return S_OK;
 }
 
@@ -290,10 +285,23 @@ void Renderer::Render()
 		t = (timeCur - timeStart) / 1000.0f;
 	}
 
+	// Initialize the view matrix
+	DirectX::XMVECTOR eyePosition = DirectX::XMLoadFloat3(&m_camera->getPosition());
+	DirectX::XMVECTOR lookAt = DirectX::XMLoadFloat3(&m_camera->getLookAt());
+	DirectX::XMVECTOR upVector = DirectX::XMLoadFloat3(&m_camera->getUp());
+	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(eyePosition, lookAt, upVector);
+	DirectX::XMMATRIX projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(m_camera->getFOV(), m_camera->getWidth() / (FLOAT)m_camera->getHeight(), m_camera->getNearZ(), m_camera->getFarZ());
+
 	//
 	// Clear the back buffer
 	//
 	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, DirectX::Colors::MidnightBlue);
+
+	//
+	// Clear the depth buffer to 1.0 (max depth)
+	//
+	m_pImmediateContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
 
 	// Set primitive topology
 	m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -369,9 +377,9 @@ void Renderer::Render()
 		ConstantBuffer cb;
 		cb.mWorld = DirectX::XMMatrixTranspose(model->getWorldMatrix());
 		//cb.mWorld = DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(t));
-		cb.mView = DirectX::XMMatrixTranspose(m_View);
-		cb.mProjection = DirectX::XMMatrixTranspose(m_Projection);
-		cb.vLightDir = DirectX::XMFLOAT4(0.5f, 0.5f, -1.0f, 1.0f);
+		cb.mView = DirectX::XMMatrixTranspose(viewMatrix);
+		cb.mProjection = DirectX::XMMatrixTranspose(projectionMatrix);
+		DirectX::XMStoreFloat4(&cb.vLightDir, DirectX::XMVectorSubtract(eyePosition, lookAt));
 		cb.vLightColor = DirectX::XMFLOAT4(model->getColor().f);
 
 		m_pImmediateContext->UpdateSubresource(m_pConstantBuffer, 0, nullptr, &cb, 0, 0);
@@ -388,13 +396,18 @@ void Renderer::Render()
 	m_pSwapChain->Present(0, 0);
 }
 
+Camera *Renderer::getCamera() const
+{
+	return m_camera;
+}
+
 bool Renderer::LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size)
 {
 	bool result = true;
 
 	std::ifstream shader_file(lpszFilePath, std::ios::in | std::ios::binary | std::ios::ate);
 	if (shader_file.good()) {
-		size = shader_file.tellg();
+		size = (size_t)shader_file.tellg();
 		*ppBlobOut = new char[size];
 		shader_file.seekg(0);
 		shader_file.read(*ppBlobOut, size);

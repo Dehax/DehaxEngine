@@ -31,7 +31,7 @@ public:
 
 	Model &operator=(const Model &model);
 private:
-	Mesh *m_mesh;
+	Mesh *m_mesh = nullptr;
 	DirectX::XMVECTORF32 m_color;
 
 	// World
@@ -46,5 +46,5 @@ private:
 	DirectX::XMMATRIX m_pivotMatrix;
 	DirectX::XMMATRIX m_pivotInverseMatrix;
 
-	LPCWSTR m_name;
+	LPCWSTR m_name = nullptr;
 };

@@ -20,3 +20,4 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 #pragma warning(disable : 4251)
+#pragma warning(disable : 4316)

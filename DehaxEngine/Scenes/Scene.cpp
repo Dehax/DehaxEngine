@@ -29,7 +29,7 @@ void Scene::RemoveModel(const int &index)
 
 unsigned int Scene::getNumObjects() const
 {
-	return m_objects.size();
+	return (unsigned int)m_objects.size();
 }
 
 Model *Scene::operator[](const int &i)

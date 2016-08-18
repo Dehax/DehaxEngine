@@ -29,6 +29,12 @@
       <UniqueIdentifier>{c785228e-62b7-49b9-b5b8-bf46b44b5a40}</UniqueIdentifier>
       <Extensions>hlsl;fx</Extensions>
     </Filter>
+    <Filter Include="Заголовочные файлы\Renderer">
+      <UniqueIdentifier>{232c27e3-0c9a-4264-b39b-0c769b6872a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\Renderer">
+      <UniqueIdentifier>{e9c6019c-3464-4426-a76d-e0044503d59b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -55,8 +61,11 @@
     <ClInclude Include="Models\ModelsFactory.h">
       <Filter>Заголовочные файлы\Models</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Заголовочные файлы</Filter>
+    <ClInclude Include="Renderer\Renderer.h">
+      <Filter>Заголовочные файлы\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Camera.h">
+      <Filter>Заголовочные файлы\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -84,8 +93,11 @@
     <ClCompile Include="Models\ModelsFactory.cpp">
       <Filter>Файлы исходного кода\Models</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Файлы исходного кода</Filter>
+    <ClCompile Include="Renderer\Renderer.cpp">
+      <Filter>Файлы исходного кода\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Camera.cpp">
+      <Filter>Файлы исходного кода\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

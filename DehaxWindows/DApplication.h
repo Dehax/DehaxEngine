@@ -11,6 +11,6 @@ public:
 
 	void setUpdateHandler(ApplicationUpdateHandler updateHandler);
 private:
-	HACCEL m_hAccelTable;
-	ApplicationUpdateHandler m_updateHandler;
+	HACCEL m_hAccelTable = nullptr;
+	ApplicationUpdateHandler m_updateHandler = nullptr;
 };

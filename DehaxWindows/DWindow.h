@@ -3,6 +3,7 @@
 #include "DehaxWindows.h"
 
 typedef bool(*KeyDownHandler)(unsigned int virtualCode);
+typedef LRESULT(*WindowMessageHandler)(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 class DEHAXWINDOWS_API DWindow {
 public:
@@ -13,20 +14,22 @@ public:
 	LPCWSTR getTitle() const;
 
 	void setKeyDownHandler(KeyDownHandler keyDownHandler);
+	void setWindowMessageHandler(WindowMessageHandler windowMessageHandler);
 private:
 	ATOM RegisterWindowClass();
 	static LRESULT CALLBACK StaticWindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	HINSTANCE m_hInstance;
-	HICON m_hIcon;
-	HCURSOR m_hCursor;
-	HBRUSH m_hBackgroundBrush;
-	LPCWSTR m_lpszMenuName;
-	LPCWSTR m_lpszClassName;
-	LPCWSTR m_lpszTitle;
-	HICON m_hIconSmall;
-	HWND m_hWnd;
+	HINSTANCE m_hInstance = nullptr;
+	HICON m_hIcon = nullptr;
+	HCURSOR m_hCursor = nullptr;
+	HBRUSH m_hBackgroundBrush = nullptr;
+	LPCWSTR m_lpszMenuName = nullptr;
+	LPCWSTR m_lpszClassName = nullptr;
+	LPCWSTR m_lpszTitle = nullptr;
+	HICON m_hIconSmall = nullptr;
+	HWND m_hWnd = nullptr;
 
-	KeyDownHandler m_keyDownHandler;
+	KeyDownHandler m_keyDownHandler = nullptr;
+	WindowMessageHandler m_windowMessageHandler = nullptr;
 };

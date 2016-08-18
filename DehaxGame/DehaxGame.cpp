@@ -4,12 +4,18 @@
 #include <Models\Mesh.h>
 #include <Models\ModelsFactory.h>
 
-DehaxEngine *dehaxEngine;
-Model *model;
+const float MOUSE_CAMERA_MOVE_SCALE = 0.1f;
+
+DehaxEngine *g_dehaxEngine;
+Model *g_smallBox;
+Model *g_bigBox;
+
+bool g_isMousePressed = false;
+POINT g_lastMousePosition;
 
 void Update()
 {
-	dehaxEngine->getRenderer()->Render();
+	g_dehaxEngine->getRenderer()->Render();
 }
 
 bool KeyDown(unsigned int virtualCode)
@@ -18,41 +24,154 @@ bool KeyDown(unsigned int virtualCode)
 	{
 	case VK_RIGHT:
 	{
-		DirectX::XMFLOAT3 position = model->getPosition();
-		model->setPosition(DirectX::XMFLOAT3(position.x + 0.5f, position.y, position.z));
+		DirectX::XMFLOAT3 position = g_smallBox->getPosition();
+		g_smallBox->setPosition(DirectX::XMFLOAT3(position.x + 0.5f, position.y, position.z));
 		
 		return true;
 	}
 	break;
 	case VK_LEFT:
 	{
-		DirectX::XMFLOAT3 position = model->getPosition();
-		model->setPosition(DirectX::XMFLOAT3(position.x - 0.5f, position.y, position.z));
+		DirectX::XMFLOAT3 position = g_smallBox->getPosition();
+		g_smallBox->setPosition(DirectX::XMFLOAT3(position.x - 0.5f, position.y, position.z));
 
 		return true;
 	}
 	break;
-	default:
 	case VK_UP:
 	{
-		DirectX::XMFLOAT3 position = model->getPosition();
-		model->setPosition(DirectX::XMFLOAT3(position.x, position.y + 0.5f, position.z));
+		DirectX::XMFLOAT3 position = g_smallBox->getPosition();
+		g_smallBox->setPosition(DirectX::XMFLOAT3(position.x, position.y + 0.5f, position.z));
 
 		return true;
 	}
 	break;
 	case VK_DOWN:
 	{
-		DirectX::XMFLOAT3 position = model->getPosition();
-		model->setPosition(DirectX::XMFLOAT3(position.x, position.y - 0.5f, position.z));
+		DirectX::XMFLOAT3 position = g_smallBox->getPosition();
+		g_smallBox->setPosition(DirectX::XMFLOAT3(position.x, position.y - 0.5f, position.z));
 
 		return true;
 	}
 	break;
+	case 0x4C:
+	{
+		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
+		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x + 0.5f, position.y, position.z));
+
+		return true;
+	}
+	break;
+	case 0x4A:
+	{
+		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
+		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x - 0.5f, position.y, position.z));
+
+		return true;
+	}
+	break;
+	case 0x49:
+	{
+		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
+		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x, position.y + 0.5f, position.z));
+
+		return true;
+	}
+	break;
+	case 0x4B:
+	{
+		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
+		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x, position.y - 0.5f, position.z));
+
+		return true;
+	}
+	break;
+	case VK_NUMPAD6:
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->Rotate(0.0f, DirectX::XMConvertToRadians(1.0f), 0.0f);
+
+		return true;
+	}
+	break;
+	case VK_NUMPAD4:
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->Rotate(0.0f, -DirectX::XMConvertToRadians(1.0f), 0.0f);
+
+		return true;
+	}
+	break;
+	case VK_NUMPAD8:
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->Rotate(DirectX::XMConvertToRadians(1.0f), 0.0f, 0.0f);
+
+		return true;
+	}
+	break;
+	case VK_NUMPAD2:
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->Rotate(-DirectX::XMConvertToRadians(1.0f), 0.0f, 0.0f);
+
+		return true;
+	}
+	break;
+	default:
 		break;
 	}
 
 	return false;
+}
+
+LRESULT WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_LBUTTONDOWN:
+	{
+		if (wParam == MK_LBUTTON) {
+			int x = GET_X_LPARAM(lParam);
+			int y = GET_Y_LPARAM(lParam);
+			g_isMousePressed = true;
+			g_lastMousePosition = { x, y };
+		}
+	}
+	break;
+	case WM_MOUSEMOVE:
+	{
+		if (!g_isMousePressed) {
+			break;
+		}
+
+		if (wParam == MK_LBUTTON) {
+			int x = GET_X_LPARAM(lParam);
+			int y = GET_Y_LPARAM(lParam);
+			POINT mousePosition = { x, y };
+
+			int deltaX = mousePosition.x - g_lastMousePosition.x;
+			int deltaY = mousePosition.y - g_lastMousePosition.y;
+
+			if (deltaX == 0 && deltaY == 0) {
+				break;
+			}
+
+			g_dehaxEngine->getRenderer()->getCamera()->Rotate(DirectX::XMConvertToRadians(-deltaY * MOUSE_CAMERA_MOVE_SCALE), DirectX::XMConvertToRadians(-deltaX * MOUSE_CAMERA_MOVE_SCALE), 0.0f);
+
+			g_lastMousePosition = mousePosition;
+		}
+	}
+	break;
+	case WM_LBUTTONUP:
+	{
+		if (wParam == MK_LBUTTON) {
+			g_isMousePressed = false;
+		}
+	}
+	break;
+	default:
+		return DefWindowProcW(hWnd, message, wParam, lParam);
+		break;
+	}
+
+	return 0;
 }
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
@@ -77,19 +196,23 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 		szWindowClass,
 		szTitle);
 	window.setKeyDownHandler(KeyDown);
+	window.setWindowMessageHandler(WindowProcedure);
 	window.Show(nCmdShow);
 
 	application.setUpdateHandler(Update);
 
-	model = new Model(ModelsFactory::Box());
+	g_smallBox = new Model(ModelsFactory::Box());
+	g_bigBox = new Model(ModelsFactory::Box(2.0f, 4.0f, 8.0f));
+	g_bigBox->setColor(DirectX::Colors::Yellow);
 
-	dehaxEngine = new DehaxEngine();
-	dehaxEngine->getScene()->AddModel(model);
-	dehaxEngine->getRenderer()->InitDevice(window.getHandle());
+	g_dehaxEngine = new DehaxEngine();
+	g_dehaxEngine->getScene()->AddModel(g_smallBox);
+	g_dehaxEngine->getScene()->AddModel(g_bigBox);
+	g_dehaxEngine->getRenderer()->InitDevice(window.getHandle());
 
 	int resultCode = application.Run();
 
-	delete dehaxEngine;
+	delete g_dehaxEngine;
 
 	return resultCode;
 }
