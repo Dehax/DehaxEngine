@@ -1,6 +1,11 @@
 #include "..\stdafx.h"
 #include "Model.h"
 
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
 Model::Model()
 	: m_mesh(nullptr)
 {
@@ -38,6 +43,127 @@ Model::Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color)
 	m_transformMatrix = DirectX::XMMatrixIdentity();
 	m_rotateMatrix = DirectX::XMMatrixIdentity();
 	m_scaleMatrix = DirectX::XMMatrixIdentity();
+}
+
+Model::Model(LPCWSTR filePath, const DirectX::XMVECTORF32 &color)
+	: Model(L"ModelObj", new Mesh(), color)
+{
+	std::wifstream file(filePath);
+
+	std::vector<DirectX::XMFLOAT3> vertices;
+	std::vector<DirectX::XMFLOAT3> verticesNormal;
+	std::vector<DirectX::XMUINT3> facesVertexIndex, facesVertexNormalIndex;
+
+	if (file.good()) {
+		std::wstring line;
+		
+		int i = 0;
+		while (std::getline(file, line)) {
+			std::wistringstream iss(line);
+			std::wstring tmp;
+			float x, y, z;
+			iss >> tmp;
+
+			if (!tmp.compare(L"v")) {
+				iss >> x >> y >> z;
+				vertices.push_back(DirectX::XMFLOAT3(x, y, z));
+			} else if (!tmp.compare(L"vn")) {
+				iss >> x >> y >> z;
+				verticesNormal.push_back(DirectX::XMFLOAT3(x, y, z));
+			} else if (!tmp.compare(L"f")) {
+				std::wstring faceText;
+				//DirectX::XMUINT3 faceVerticesIndexes, faceNormalsIndexes;
+
+				// ========================
+				int vi[3], ni[3];
+
+				for (size_t j = 0; j < 3; j++) {
+					iss >> faceText;
+
+					size_t firstDelimiterIndex = faceText.find_first_of(L'/');
+					size_t lastDelimiterIndex = faceText.find_last_of(L'/');
+
+					vi[j] = std::wcstol(faceText.substr(0U, firstDelimiterIndex).c_str(), nullptr, 10);
+					//int v2 = std::wcstol(first.substr(firstDelimiterIndex, lastDelimiterIndex - firstDelimiterIndex + 1).c_str(), nullptr, 10);
+					ni[j] = std::wcstol(faceText.substr(lastDelimiterIndex + 1, faceText.length() - lastDelimiterIndex - 1).c_str(), nullptr, 10);
+				}
+
+				facesVertexIndex.push_back(DirectX::XMUINT3(vi[0], vi[1], vi[2]));
+				facesVertexNormalIndex.push_back(DirectX::XMUINT3(ni[0], ni[1], ni[2]));
+
+				// =======================
+
+				//iss >> faceText;
+
+				//size_t firstDelimiterIndex = faceText.find_first_of(L'/');
+				//size_t lastDelimiterIndex = faceText.find_last_of(L'/');
+
+				//int vertexIndex = std::wcstol(faceText.substr(0U, firstDelimiterIndex).c_str(), nullptr, 10);
+				////int v2 = std::wcstol(first.substr(firstDelimiterIndex, lastDelimiterIndex - firstDelimiterIndex + 1).c_str(), nullptr, 10);
+				//int normalIndex = std::wcstol(faceText.substr(lastDelimiterIndex + 1, faceText.length() - lastDelimiterIndex - 1).c_str(), nullptr, 10);
+				//DirectX::XMFLOAT3 &vn = verticesNormal[normalIndex - 1];
+				//DirectX::XMFLOAT3 &v = vertices[vertexIndex - 1];
+				//Vertex v1(v.x, v.y, v.z, vn.x, vn.y, vn.z);
+				////m_mesh->AddVertex(vertex);
+
+				//iss >> faceText;
+
+				//firstDelimiterIndex = faceText.find_first_of(L'/');
+				//lastDelimiterIndex = faceText.find_last_of(L'/');
+
+				//vertexIndex = std::wcstol(faceText.substr(0U, firstDelimiterIndex).c_str(), nullptr, 10);
+				////v2 = std::wcstol(first.substr(firstDelimiterIndex, lastDelimiterIndex - firstDelimiterIndex + 1).c_str(), nullptr, 10);
+				//normalIndex = std::wcstol(faceText.substr(lastDelimiterIndex + 1, faceText.length() - lastDelimiterIndex - 1).c_str(), nullptr, 10);
+				//vn = verticesNormal[normalIndex - 1];
+				//v = vertices[vertexIndex - 1];
+				//Vertex v2 = Vertex(v.x, v.y, v.z, vn.x, vn.y, vn.z);
+				////m_mesh->AddVertex(vertex);
+
+				//iss >> faceText;
+
+				//firstDelimiterIndex = faceText.find_first_of(L'/');
+				//lastDelimiterIndex = faceText.find_last_of(L'/');
+
+				//vertexIndex = std::wcstol(faceText.substr(0U, firstDelimiterIndex).c_str(), nullptr, 10);
+				////v2 = std::wcstol(first.substr(firstDelimiterIndex, lastDelimiterIndex - firstDelimiterIndex + 1).c_str(), nullptr, 10);
+				//normalIndex = std::wcstol(faceText.substr(lastDelimiterIndex + 1, faceText.length() - lastDelimiterIndex - 1).c_str(), nullptr, 10);
+				//vn = verticesNormal[normalIndex - 1];
+				//v = vertices[vertexIndex - 1];
+				//Vertex vertex3 = Vertex(v.x, v.y, v.z, vn.x, vn.y, vn.z);
+				////m_mesh->AddVertex(vertex);
+
+				//m_mesh->AddFace(DirectX::XMUINT3(i, i + 1, i + 2));
+				i += 3;
+			}
+		}
+	}
+
+	for (size_t i = 0; i < facesVertexIndex.size(); i++) {
+		DirectX::XMUINT3 faceVerticesIndexes = facesVertexIndex[i];
+		DirectX::XMUINT3 faceNormalsIndexes = facesVertexNormalIndex[i];
+
+		Vertex vertex(vertices[faceVerticesIndexes.x - 1], verticesNormal[faceNormalsIndexes.x - 1]);
+		m_mesh->AddVertex(vertex);
+		vertex = Vertex(vertices[faceVerticesIndexes.y - 1], verticesNormal[faceNormalsIndexes.y - 1]);
+		m_mesh->AddVertex(vertex);
+		vertex = Vertex(vertices[faceVerticesIndexes.z - 1], verticesNormal[faceNormalsIndexes.z - 1]);
+		m_mesh->AddVertex(vertex);
+
+		m_mesh->AddFace(DirectX::XMUINT3(i * 3, i * 3 + 1, i * 3 + 2));
+	}
+
+	//std::vector<DirectX::XMFLOAT3> normalsPerVertex(vertices.size());
+
+	//for (size_t i = 0; i < normalsPerVertex.size(); i++) {
+	//	normalsPerVertex[i] = DirectX::XMFLOAT3(face);
+	//}
+
+	//for (size_t i = 0; i < vertices.size(); i++) {
+	//	Vertex vertex(vertices[i].x, vertices[i].y, vertices[i].z, normalsPerVertex[i].x, normalsPerVertex[i].y, normalsPerVertex[i].z);
+	//	m_mesh->AddVertex(vertex);
+	//}
+
+	file.close();
 }
 
 Model::~Model()

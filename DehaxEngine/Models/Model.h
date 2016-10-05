@@ -10,6 +10,7 @@ public:
 	Model();
 	Model(const Model &model);
 	Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color);
+	Model(LPCWSTR filePath, const DirectX::XMVECTORF32 &color);
 	~Model();
 
 	DirectX::XMFLOAT3 getPosition() const;

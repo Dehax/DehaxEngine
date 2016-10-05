@@ -56,6 +56,11 @@ void Camera::Rotate(const float &angleX, const float &angleY, const float &angle
 	DirectX::XMStoreFloat3(&m_position, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&newPosition), DirectX::XMLoadFloat3(&m_lookAt)));
 }
 
+void Camera::RotateAround(const float &angleX, const float &angleY, const float &angleZ)
+{
+	
+}
+
 void Camera::Zoom(const float &multiplier)
 {
 	if (std::abs(multiplier) < 0.000001f) {
@@ -66,7 +71,7 @@ void Camera::Zoom(const float &multiplier)
 
 	switch (m_projection) {
 	case Parallel:
-		m_zoom /= zoom;
+		m_zoom *= zoom;
 		break;
 	case Perspective:
 		float newFOV = m_fov - multiplier * DirectX::XMConvertToRadians(1.0f);
@@ -89,6 +94,45 @@ void Camera::Move(const DirectX::XMFLOAT3 &offset)
 {
 	DirectX::XMStoreFloat3(&m_position, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&m_position), DirectX::XMLoadFloat3(&offset)));
 	DirectX::XMStoreFloat3(&m_lookAt, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&m_lookAt), DirectX::XMLoadFloat3(&offset)));
+}
+
+void Camera::StrafeRight(const float &value)
+{
+	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&m_position);
+	DirectX::XMVECTOR lookAt = DirectX::XMLoadFloat3(&m_lookAt);
+
+	DirectX::XMVECTOR zAxis = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(lookAt, position));
+	DirectX::XMVECTOR xAxis = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&m_up), zAxis));
+	DirectX::XMVECTOR delta = DirectX::XMVectorScale(xAxis, value);
+
+	DirectX::XMStoreFloat3(&m_position, DirectX::XMVectorAdd(position, delta));
+	DirectX::XMStoreFloat3(&m_lookAt, DirectX::XMVectorAdd(lookAt, delta));
+}
+
+void Camera::StrafeForward(const float &value)
+{
+	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&m_position);
+	DirectX::XMVECTOR lookAt = DirectX::XMLoadFloat3(&m_lookAt);
+
+	DirectX::XMVECTOR zAxis = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(lookAt, position));
+	DirectX::XMVECTOR delta = DirectX::XMVectorScale(zAxis, value);
+
+	DirectX::XMStoreFloat3(&m_position, DirectX::XMVectorAdd(position, delta));
+	DirectX::XMStoreFloat3(&m_lookAt, DirectX::XMVectorAdd(lookAt, delta));
+}
+
+void Camera::StrafeUp(const float &value)
+{
+	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&m_position);
+	DirectX::XMVECTOR lookAt = DirectX::XMLoadFloat3(&m_lookAt);
+
+	DirectX::XMVECTOR zAxis = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(lookAt, position));
+	DirectX::XMVECTOR xAxis = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(zAxis, DirectX::XMLoadFloat3(&m_up)));
+	DirectX::XMVECTOR yAxis = DirectX::XMVector3Cross(xAxis, zAxis);
+	DirectX::XMVECTOR delta = DirectX::XMVectorScale(yAxis, value);
+
+	DirectX::XMStoreFloat3(&m_position, DirectX::XMVectorAdd(position, delta));
+	DirectX::XMStoreFloat3(&m_lookAt, DirectX::XMVectorAdd(lookAt, delta));
 }
 
 float Camera::getViewDistance() const

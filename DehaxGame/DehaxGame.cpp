@@ -22,6 +22,30 @@ bool KeyDown(unsigned int virtualCode)
 {
 	switch (virtualCode)
 	{
+	case 0x57: // W
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->StrafeForward(1.0f);
+
+		return true;
+	}
+	break;
+	case 0x53: // S
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->StrafeForward(-1.0f);
+	}
+	break;
+	case 0x41: // A
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->StrafeRight(-1.0f);
+
+		return true;
+	}
+	break;
+	case 0x44: // D
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->StrafeRight(1.0f);
+	}
+	break;
 	case VK_RIGHT:
 	{
 		DirectX::XMFLOAT3 position = g_smallBox->getPosition();
@@ -54,7 +78,7 @@ bool KeyDown(unsigned int virtualCode)
 		return true;
 	}
 	break;
-	case 0x4C:
+	case 0x4C: // L
 	{
 		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
 		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x + 0.5f, position.y, position.z));
@@ -62,7 +86,7 @@ bool KeyDown(unsigned int virtualCode)
 		return true;
 	}
 	break;
-	case 0x4A:
+	case 0x4A: // J
 	{
 		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
 		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x - 0.5f, position.y, position.z));
@@ -70,7 +94,7 @@ bool KeyDown(unsigned int virtualCode)
 		return true;
 	}
 	break;
-	case 0x49:
+	case 0x49: // I
 	{
 		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
 		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x, position.y + 0.5f, position.z));
@@ -78,7 +102,7 @@ bool KeyDown(unsigned int virtualCode)
 		return true;
 	}
 	break;
-	case 0x4B:
+	case 0x4B: // K
 	{
 		DirectX::XMFLOAT3 position = g_bigBox->getPosition();
 		g_bigBox->setPosition(DirectX::XMFLOAT3(position.x, position.y - 0.5f, position.z));
@@ -114,8 +138,29 @@ bool KeyDown(unsigned int virtualCode)
 		return true;
 	}
 	break;
-	default:
-		break;
+	case VK_ADD:
+	case VK_OEM_PLUS:
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->Zoom(2.0f);
+
+		return true;
+	}
+	break;
+	case VK_SUBTRACT:
+	case VK_OEM_MINUS:
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->Zoom(-2.0f);
+
+		return true;
+	}
+	break;
+	case 0x50:
+	{
+		g_dehaxEngine->getRenderer()->getCamera()->ChangeProjection();
+
+		return true;
+	}
+	break;
 	}
 
 	return false;
@@ -204,10 +249,12 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	g_smallBox = new Model(ModelsFactory::Box());
 	g_bigBox = new Model(ModelsFactory::Box(2.0f, 4.0f, 8.0f));
 	g_bigBox->setColor(DirectX::Colors::Yellow);
+	Model *objBoxModel = new Model(L"..\\cube.obj", DirectX::Colors::GreenYellow);
 
 	g_dehaxEngine = new DehaxEngine();
-	g_dehaxEngine->getScene()->AddModel(g_smallBox);
-	g_dehaxEngine->getScene()->AddModel(g_bigBox);
+	//g_dehaxEngine->getScene()->AddModel(g_smallBox);
+	//g_dehaxEngine->getScene()->AddModel(g_bigBox);
+	g_dehaxEngine->getScene()->AddModel(objBoxModel);
 	g_dehaxEngine->getRenderer()->InitDevice(window.getHandle());
 
 	int resultCode = application.Run();

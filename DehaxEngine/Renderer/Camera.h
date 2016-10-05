@@ -11,12 +11,13 @@ public:
 	Camera(const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &lookAt, const DirectX::XMFLOAT3 &up, float FOV = DirectX::XM_PIDIV2);
 
 	void Rotate(const float &angleX, const float &angleY, const float &angleZ);
+	void RotateAround(const float &angleX, const float &angleY, const float &angleZ);
 	void Zoom(const float &multiplier);
 	void ChangeProjection();
 	void Move(const DirectX::XMFLOAT3 &offset);
-	/*void StrafeRight(const float &value);
+	void StrafeRight(const float &value);
 	void StrafeForward(const float &value);
-	void StrafeUp(const float &value);*/
+	void StrafeUp(const float &value);
 
 	int getWidth() const;
 	void setWidth(const int &width);
@@ -49,7 +50,7 @@ private:
 	const float DEFAULT_FOV = DirectX::XM_PIDIV2;
 	const float MIN_FOV = 20.0f;
 	const float MAX_FOV = 150.0f;
-	const float DEFAULT_PARALLEL_ZOOM = 500.0f;
+	const float DEFAULT_PARALLEL_ZOOM = 5.0f;
 	const float DEFAULT_NEAR_Z = 0.01f;
 	const float DEFAULT_FAR_Z = 100.0f;
 

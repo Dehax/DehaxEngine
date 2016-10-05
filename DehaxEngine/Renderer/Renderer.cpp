@@ -48,17 +48,15 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	};
 	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
 
-	for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
-	{
+	for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++) {
 		m_driverType = driverTypes[driverTypeIndex];
 		hr = D3D11CreateDevice(nullptr, m_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &m_pd3dDevice, &m_featureLevel, &m_pImmediateContext);
+							   D3D11_SDK_VERSION, &m_pd3dDevice, &m_featureLevel, &m_pImmediateContext);
 
-		if (hr == E_INVALIDARG)
-		{
-			// DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it
+		if (hr == E_INVALIDARG) {
+			// DirectX 11.0 платформы не распознают D3D_FEATURE_LEVEL_11_1, поэтому нужно попробовать без него
 			hr = D3D11CreateDevice(nullptr, m_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
-				D3D11_SDK_VERSION, &m_pd3dDevice, &m_featureLevel, &m_pImmediateContext);
+								   D3D11_SDK_VERSION, &m_pd3dDevice, &m_featureLevel, &m_pImmediateContext);
 		}
 
 		if (SUCCEEDED(hr))
@@ -67,17 +65,15 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	if (FAILED(hr))
 		return hr;
 
-	// Obtain DXGI factory from device (since we used nullptr for pAdapter above)
+	// Получить DXGI factory устройства (since we used nullptr for pAdapter above)
 	IDXGIFactory1* dxgiFactory = nullptr;
 	{
 		IDXGIDevice* dxgiDevice = nullptr;
 		hr = m_pd3dDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice));
-		if (SUCCEEDED(hr))
-		{
+		if (SUCCEEDED(hr)) {
 			IDXGIAdapter* adapter = nullptr;
 			hr = dxgiDevice->GetAdapter(&adapter);
-			if (SUCCEEDED(hr))
-			{
+			if (SUCCEEDED(hr)) {
 				hr = adapter->GetParent(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&dxgiFactory));
 				adapter->Release();
 			}
@@ -87,20 +83,18 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	if (FAILED(hr))
 		return hr;
 
-	// Create swap chain
+	// Создать swap chain
 	IDXGIFactory2* dxgiFactory2 = nullptr;
 	hr = dxgiFactory->QueryInterface(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&dxgiFactory2));
-	if (dxgiFactory2)
-	{
-		// DirectX 11.1 or later
+	if (dxgiFactory2) {
+		// DirectX 11.1 или более новая версия
 		hr = m_pd3dDevice->QueryInterface(__uuidof(ID3D11Device1), reinterpret_cast<void**>(&m_pd3dDevice1));
-		if (SUCCEEDED(hr))
-		{
+		if (SUCCEEDED(hr)) {
 			(void)m_pImmediateContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&m_pImmediateContext1));
 		}
 
 		DXGI_SWAP_CHAIN_DESC1 sd;
-		ZeroMemory(&sd, sizeof(sd));
+		memset(&sd, 0, sizeof(sd));
 		sd.Width = width;
 		sd.Height = height;
 		sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -110,18 +104,15 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 		sd.BufferCount = 1;
 
 		hr = dxgiFactory2->CreateSwapChainForHwnd(m_pd3dDevice, hWnd, &sd, nullptr, nullptr, &m_pSwapChain1);
-		if (SUCCEEDED(hr))
-		{
+		if (SUCCEEDED(hr)) {
 			hr = m_pSwapChain1->QueryInterface(__uuidof(IDXGISwapChain), reinterpret_cast<void**>(&m_pSwapChain));
 		}
 
 		dxgiFactory2->Release();
-	}
-	else
-	{
-		// DirectX 11.0 systems
+	} else {
+		// DirectX 11.0 системы
 		DXGI_SWAP_CHAIN_DESC sd;
-		ZeroMemory(&sd, sizeof(sd));
+		memset(&sd, 0, sizeof(sd));
 		sd.BufferCount = 1;
 		sd.BufferDesc.Width = width;
 		sd.BufferDesc.Height = height;
@@ -137,7 +128,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 		hr = dxgiFactory->CreateSwapChain(m_pd3dDevice, &sd, &m_pSwapChain);
 	}
 
-	// Note this tutorial doesn't handle full-screen swapchains so we block the ALT+ENTER shortcut
+	// Пока не перехватывается полный экран, поэтому блокируем сочетание Alt+Enter
 	dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
 
 	dxgiFactory->Release();
@@ -158,7 +149,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 
 	// Create depth stencil texture
 	D3D11_TEXTURE2D_DESC descDepth;
-	ZeroMemory(&descDepth, sizeof(descDepth));
+	memset(&descDepth, 0, sizeof(descDepth));
 	descDepth.Width = width;
 	descDepth.Height = height;
 	descDepth.MipLevels = 1;
@@ -176,7 +167,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 
 	// Create the depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-	ZeroMemory(&descDSV, sizeof(descDSV));
+	memset(&descDSV, 0, sizeof(descDSV));
 	descDSV.Format = descDepth.Format;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0;
@@ -186,7 +177,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 
 	m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 
-	// Setup the viewport
+	// Установить окно просмотра
 	D3D11_VIEWPORT vp;
 	vp.Width = (FLOAT)width;
 	vp.Height = (FLOAT)height;
@@ -196,7 +187,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	vp.TopLeftY = 0;
 	m_pImmediateContext->RSSetViewports(1, &vp);
 
-	// Compile the vertex shader
+	// Компиляция вершинного шейдера
 	//ID3DBlob* pVSBlob = nullptr;
 	//hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "VS", "vs_4_0", &pVSBlob);
 	//if (FAILED(hr))
@@ -213,16 +204,15 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 		return S_FALSE;
 	}
 
-	// Create the vertex shader
+	// Создать вершинный шейдер
 	hr = m_pd3dDevice->CreateVertexShader(pVSBlob/*->GetBufferPointer()*/, VSSize/*pVSBlob->GetBufferSize()*/, nullptr, &m_pVertexShader);
-	if (FAILED(hr))
-	{
+	if (FAILED(hr)) {
 		//pVSBlob->Release();
 		delete[] pVSBlob;
 		return hr;
 	}
 
-	// Define the input layout
+	// Определить разметку входных данных вершинного шейдера
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -230,17 +220,17 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	};
 	UINT numElements = ARRAYSIZE(layout);
 
-	// Create the input layout
+	// Создать разметку входных данных вершинного шейдера
 	hr = m_pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob/*->GetBufferPointer()*/, /*pVSBlob->GetBufferSize()*/VSSize, &m_pVertexLayout);
 	//pVSBlob->Release();
 	delete[] pVSBlob;
 	if (FAILED(hr))
 		return hr;
 
-	// Set the input layout
+	// Установить разметку
 	m_pImmediateContext->IASetInputLayout(m_pVertexLayout);
 
-	// Compile the pixel shader
+	// Скомпилировать пиксельный шейдер
 	//ID3DBlob* pPSBlob = nullptr;
 	//hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "PS", "ps_4_0", &pPSBlob);
 	//if (FAILED(hr))
@@ -256,7 +246,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 		return S_FALSE;
 	}
 
-	// Create the pixel shader
+	// Создать пиксельный шейдер
 	hr = m_pd3dDevice->CreatePixelShader(pPSBlob/*->GetBufferPointer()*/, /*pPSBlob->GetBufferSize()*/PSSize, nullptr, &m_pPixelShader);
 	/*pPSBlob->Release();*/
 	delete[] pPSBlob;
@@ -270,40 +260,41 @@ void Renderer::Render()
 {
 	HRESULT hr = S_OK;
 
-	// Update our time
+	// Обновить время
 	static float t = 0.0f;
-	if (m_driverType == D3D_DRIVER_TYPE_REFERENCE)
-	{
+	if (m_driverType == D3D_DRIVER_TYPE_REFERENCE) {
 		t += (float)DirectX::XM_PI * 0.0125f;
-	}
-	else
-	{
+	} else {
 		static ULONGLONG timeStart = 0;
 		ULONGLONG timeCur = GetTickCount64();
-		if (timeStart == 0)
+
+		if (timeStart == 0) {
 			timeStart = timeCur;
+		}
+
 		t = (timeCur - timeStart) / 1000.0f;
 	}
 
-	// Initialize the view matrix
+	// Инициализировать матрицы
 	DirectX::XMVECTOR eyePosition = DirectX::XMLoadFloat3(&m_camera->getPosition());
 	DirectX::XMVECTOR lookAt = DirectX::XMLoadFloat3(&m_camera->getLookAt());
 	DirectX::XMVECTOR upVector = DirectX::XMLoadFloat3(&m_camera->getUp());
 	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(eyePosition, lookAt, upVector);
-	DirectX::XMMATRIX projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(m_camera->getFOV(), m_camera->getWidth() / (FLOAT)m_camera->getHeight(), m_camera->getNearZ(), m_camera->getFarZ());
+	DirectX::XMMATRIX projectionMatrix;
 
-	//
-	// Clear the back buffer
-	//
+	if (m_camera->getProjection() == Camera::Perspective) {
+		projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(m_camera->getFOV(), m_camera->getWidth() / (FLOAT)m_camera->getHeight(), m_camera->getNearZ(), m_camera->getFarZ());
+	} else {
+		projectionMatrix = DirectX::XMMatrixOrthographicLH(m_camera->getWidth() / m_camera->getZoom(), m_camera->getHeight() / m_camera->getZoom(), m_camera->getNearZ(), m_camera->getFarZ());
+	}
+
+	// Очистить задний буфер
 	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, DirectX::Colors::MidnightBlue);
 
-	//
-	// Clear the depth buffer to 1.0 (max depth)
-	//
+	// Очистить буфер глубины значением 1.0 (максимальная глубина)
 	m_pImmediateContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-
-	// Set primitive topology
+	// Установить топологию
 	m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	Scene *scene = m_engine->getScene();
@@ -313,7 +304,7 @@ void Renderer::Render()
 		Model *model = (*scene)[i];
 		Mesh *mesh = model->getMesh();
 
-		// Create vertex buffer
+		// Создать вершинный буфер
 		unsigned int numVertices = mesh->getNumVertices();
 		SimpleVertex *vertices = new SimpleVertex[numVertices];
 
@@ -325,7 +316,7 @@ void Renderer::Render()
 		D3D11_BUFFER_DESC bd;
 		memset(&bd, 0, sizeof(bd));
 
-		// Create the constant buffer
+		// Создать константный буфер
 		bd.Usage = D3D11_USAGE_DEFAULT;
 		bd.ByteWidth = sizeof(ConstantBuffer);
 		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -342,7 +333,7 @@ void Renderer::Render()
 		hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pVertexBuffer);
 		delete[] vertices;
 
-		// Set vertex buffer
+		// Установить вершинный буфер
 		UINT stride = sizeof(SimpleVertex);
 		UINT offset = 0;
 		m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
@@ -351,7 +342,7 @@ void Renderer::Render()
 
 		int numFaces = mesh->getNumFaces();
 
-		// Create index buffer
+		// Создать индексный буфер
 		WORD *indices = new WORD[numFaces * 3];
 
 		for (int i = 0; i < numFaces; i++) {
@@ -369,7 +360,7 @@ void Renderer::Render()
 		hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pIndexBuffer);
 		delete[] indices;
 
-		// Set index buffer
+		// Установить индексный буфер
 		m_pImmediateContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 		m_pIndexBuffer->Release();
@@ -379,7 +370,7 @@ void Renderer::Render()
 		//cb.mWorld = DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(t));
 		cb.mView = DirectX::XMMatrixTranspose(viewMatrix);
 		cb.mProjection = DirectX::XMMatrixTranspose(projectionMatrix);
-		DirectX::XMStoreFloat4(&cb.vLightDir, DirectX::XMVectorSubtract(eyePosition, lookAt));
+		DirectX::XMStoreFloat4(&cb.vLightDir, DirectX::XMVectorSubtract(eyePosition, DirectX::XMLoadFloat3(&model->getPosition())));
 		cb.vLightColor = DirectX::XMFLOAT4(model->getColor().f);
 
 		m_pImmediateContext->UpdateSubresource(m_pConstantBuffer, 0, nullptr, &cb, 0, 0);
@@ -411,8 +402,7 @@ bool Renderer::LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t
 		*ppBlobOut = new char[size];
 		shader_file.seekg(0);
 		shader_file.read(*ppBlobOut, size);
-	}
-	else {
+	} else {
 		result = false;
 	}
 
