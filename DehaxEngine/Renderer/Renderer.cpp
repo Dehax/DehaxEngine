@@ -187,72 +187,6 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	vp.TopLeftY = 0;
 	m_pImmediateContext->RSSetViewports(1, &vp);
 
-	// Компиляция вершинного шейдера
-	//ID3DBlob* pVSBlob = nullptr;
-	//hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "VS", "vs_4_0", &pVSBlob);
-	//if (FAILED(hr))
-	//{
-	//	MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
-	//	return hr;
-	//}
-
-	char *pVSBlob = nullptr;
-	size_t VSSize;
-	bool result = LoadShaderFromFile(L"SimpleColor_VS.cso", &pVSBlob, VSSize);
-	if (!result) {
-		MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
-		return S_FALSE;
-	}
-
-	// Создать вершинный шейдер
-	hr = m_pd3dDevice->CreateVertexShader(pVSBlob/*->GetBufferPointer()*/, VSSize/*pVSBlob->GetBufferSize()*/, nullptr, &m_pVertexShader);
-	if (FAILED(hr)) {
-		//pVSBlob->Release();
-		delete[] pVSBlob;
-		return hr;
-	}
-
-	// Определить разметку входных данных вершинного шейдера
-	D3D11_INPUT_ELEMENT_DESC layout[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-	UINT numElements = ARRAYSIZE(layout);
-
-	// Создать разметку входных данных вершинного шейдера
-	hr = m_pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob/*->GetBufferPointer()*/, /*pVSBlob->GetBufferSize()*/VSSize, &m_pVertexLayout);
-	//pVSBlob->Release();
-	delete[] pVSBlob;
-	if (FAILED(hr))
-		return hr;
-
-	// Установить разметку
-	m_pImmediateContext->IASetInputLayout(m_pVertexLayout);
-
-	// Скомпилировать пиксельный шейдер
-	//ID3DBlob* pPSBlob = nullptr;
-	//hr = CompileShaderFromFile(L"..\\DehaxEngine\\Shaders\\SimpleColor.hlsl", "PS", "ps_4_0", &pPSBlob);
-	//if (FAILED(hr))
-	//{
-	//	MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
-	//	return hr;
-	//}
-	char *pPSBlob = nullptr;
-	size_t PSSize;
-	result = LoadShaderFromFile(L"SimpleColor_PS.cso", &pPSBlob, PSSize);
-	if (!result) {
-		MessageBoxW(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
-		return S_FALSE;
-	}
-
-	// Создать пиксельный шейдер
-	hr = m_pd3dDevice->CreatePixelShader(pPSBlob/*->GetBufferPointer()*/, /*pPSBlob->GetBufferSize()*/PSSize, nullptr, &m_pPixelShader);
-	/*pPSBlob->Release();*/
-	delete[] pPSBlob;
-	if (FAILED(hr))
-		return hr;
-
 	return S_OK;
 }
 
@@ -331,6 +265,9 @@ void Renderer::Render()
 		memset(&InitData, 0, sizeof(InitData));
 		InitData.pSysMem = vertices;
 		hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pVertexBuffer);
+		if (hr != S_OK) {
+			MessageBoxW(nullptr, L"CreateBuffer() failed", L"ERROR", MB_OK);
+		}
 		delete[] vertices;
 
 		// Установить вершинный буфер
@@ -365,12 +302,35 @@ void Renderer::Render()
 
 		m_pIndexBuffer->Release();
 
+		// ============================== SHADER ===========================================
+
+		Material *material = model->getMaterial();
+
+		char *pVSBlob = material->getVertexShaderBlob();
+		size_t VSSize = material->getVertexShaderSize();
+
+		// Создать вершинный шейдер
+		hr = m_pd3dDevice->CreateVertexShader(pVSBlob, VSSize, nullptr, &m_pVertexShader);
+
+		// Создать разметку входных данных вершинного шейдера
+		hr = m_pd3dDevice->CreateInputLayout(material->getLayout(), material->getLayoutSize(), pVSBlob, VSSize, &m_pVertexLayout);
+
+		// Установить разметку
+		m_pImmediateContext->IASetInputLayout(m_pVertexLayout);
+
+		char *pPSBlob = material->getPixelShaderBlob();
+		size_t PSSize = material->getPixelShaderSize();
+
+		// Создать пиксельный шейдер
+		hr = m_pd3dDevice->CreatePixelShader(pPSBlob, PSSize, nullptr, &m_pPixelShader);
+		// ============================== END SHADER =======================================
+
 		ConstantBuffer cb;
 		cb.mWorld = DirectX::XMMatrixTranspose(model->getWorldMatrix());
 		//cb.mWorld = DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(t));
 		cb.mView = DirectX::XMMatrixTranspose(viewMatrix);
 		cb.mProjection = DirectX::XMMatrixTranspose(projectionMatrix);
-		DirectX::XMStoreFloat4(&cb.vLightDir, DirectX::XMVectorSubtract(eyePosition, DirectX::XMLoadFloat3(&model->getPosition())));
+		DirectX::XMStoreFloat4(&cb.vLightDir, DirectX::XMVectorSubtract(eyePosition, lookAt));
 		cb.vLightColor = DirectX::XMFLOAT4(model->getColor().f);
 
 		m_pImmediateContext->UpdateSubresource(m_pConstantBuffer, 0, nullptr, &cb, 0, 0);
@@ -392,22 +352,22 @@ Camera *Renderer::getCamera() const
 	return m_camera;
 }
 
-bool Renderer::LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size)
-{
-	bool result = true;
-
-	std::ifstream shader_file(lpszFilePath, std::ios::in | std::ios::binary | std::ios::ate);
-	if (shader_file.good()) {
-		size = (size_t)shader_file.tellg();
-		*ppBlobOut = new char[size];
-		shader_file.seekg(0);
-		shader_file.read(*ppBlobOut, size);
-	} else {
-		result = false;
-	}
-
-	return result;
-}
+//bool Renderer::LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size)
+//{
+//	bool result = true;
+//
+//	std::ifstream shader_file(lpszFilePath, std::ios::in | std::ios::binary | std::ios::ate);
+//	if (shader_file.good()) {
+//		size = (size_t)shader_file.tellg();
+//		*ppBlobOut = new char[size];
+//		shader_file.seekg(0);
+//		shader_file.read(*ppBlobOut, size);
+//	} else {
+//		result = false;
+//	}
+//
+//	return result;
+//}
 
 void Renderer::CleanupDevice()
 {

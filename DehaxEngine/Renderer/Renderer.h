@@ -30,7 +30,7 @@ private:
 		DirectX::XMFLOAT4 vLightColor;
 	};
 
-	bool LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size);
+	//bool LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size);
 	void CleanupDevice();
 
 	DehaxEngine *m_engine = nullptr;

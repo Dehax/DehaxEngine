@@ -67,6 +67,9 @@
     <ClInclude Include="Renderer\Camera.h">
       <Filter>Заголовочные файлы\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Models\Material.h">
+      <Filter>Заголовочные файлы\Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -98,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="Renderer\Camera.cpp">
       <Filter>Файлы исходного кода\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Models\Material.cpp">
+      <Filter>Файлы исходного кода\Models</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,13 +4,14 @@
 #include <string>
 
 #include "Mesh.h"
+#include "Material.h"
 
 class DEHAXENGINE_API Model {
 public:
-	Model();
+	//Model();
 	Model(const Model &model);
-	Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color);
-	Model(LPCWSTR filePath, const DirectX::XMVECTORF32 &color);
+	Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color, Material *material);
+	Model(LPCWSTR filePath, const DirectX::XMVECTORF32 &color, Material *material);
 	~Model();
 
 	DirectX::XMFLOAT3 getPosition() const;
@@ -30,10 +31,15 @@ public:
 	DirectX::XMVECTORF32 getColor() const;
 	void setColor(const DirectX::XMVECTORF32 &color);
 
+	Material *getMaterial() const;
+	void setMaterial(Material *material);
+
 	Model &operator=(const Model &model);
 private:
 	Mesh *m_mesh = nullptr;
 	DirectX::XMVECTORF32 m_color;
+
+	Material *m_material;
 
 	// World
 	DirectX::XMFLOAT3 m_position;

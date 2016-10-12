@@ -6,14 +6,16 @@
 #include <string>
 #include <vector>
 
-Model::Model()
-	: m_mesh(nullptr)
-{
-}
+//Model::Model()
+//	: m_mesh(nullptr), m_material(nullptr)
+//{
+//}
 
 Model::Model(const Model &model)
+	: m_material(nullptr)
 {
 	m_mesh = new Mesh(*model.m_mesh);
+	m_material = new Material(*model.m_material);
 	m_color = model.m_color;
 
 	m_position = model.m_position;
@@ -30,8 +32,8 @@ Model::Model(const Model &model)
 	m_name = model.m_name;
 }
 
-Model::Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color)
-	: m_mesh(mesh), m_color(color), m_name(name)
+Model::Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color, Material *material)
+	: m_mesh(mesh), m_color(color), m_name(name), m_material(material)
 {
 	m_position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_rotation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -45,8 +47,8 @@ Model::Model(LPCWSTR name, Mesh *mesh, const DirectX::XMVECTORF32 &color)
 	m_scaleMatrix = DirectX::XMMatrixIdentity();
 }
 
-Model::Model(LPCWSTR filePath, const DirectX::XMVECTORF32 &color)
-	: Model(L"ModelObj", new Mesh(), color)
+Model::Model(LPCWSTR filePath, const DirectX::XMVECTORF32 &color, Material *material)
+	: Model(L"ModelObj", new Mesh(), color, material)
 {
 	std::wifstream file(filePath);
 
@@ -254,6 +256,20 @@ DirectX::XMVECTORF32 Model::getColor() const
 void Model::setColor(const DirectX::XMVECTORF32 &color)
 {
 	m_color = color;
+}
+
+Material *Model::getMaterial() const
+{
+	return m_material;
+}
+
+void Model::setMaterial(Material *material)
+{
+	if (m_material != nullptr) {
+		delete m_material;
+	}
+
+	m_material = material;
 }
 
 Model &Model::operator=(const Model &model)
