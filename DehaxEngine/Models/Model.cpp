@@ -174,6 +174,11 @@ Model::~Model()
 		delete m_mesh;
 		m_mesh = nullptr;
 	}
+
+	if (m_material != nullptr) {
+		delete m_material;
+		m_material = nullptr;
+	}
 }
 
 DirectX::XMFLOAT3 Model::getPosition() const

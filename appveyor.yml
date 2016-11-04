@@ -1,0 +1,33 @@
+version: 1.0.{build}
+
+branches:
+  except:
+    - gh-pages
+
+build:
+  verbosity: minimal
+
+platform: x86
+
+configuration: Release
+
+after_build:
+  - 7z a DehaxEngine-x86.zip %CONFIGURATION%\*.exe
+  - 7z a DehaxEngine-x86.zip %CONFIGURATION%\*.dll
+  - 7z a DehaxEngine-x86.zip %CONFIGURATION%\*.cso
+
+artifacts:
+  - path: DehaxEngine-x86.zip
+    name: DehaxEngine
+
+deploy:
+  - provider: GitHub
+    tag: push_build
+    release: DehaxEngine
+    description: 'Release of the DehaxEngine'
+    auth_token:
+      secure: hJNjTvWa0u5NMM7SUMuO9Yr5/bF6Wd78mUebkrvhMTm9ZoT36GuH2pHZgpLoAAgT
+    artifact: DehaxEngine
+    draft: true
+    prerelease: true
+    force_update: true

@@ -4,12 +4,28 @@
 #include <Models\Mesh.h>
 #include <Models\ModelsFactory.h>
 
+//#define FIND_MEMORY_LEAKS
+
+#ifdef FIND_MEMORY_LEAKS
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#ifndef DBG_NEW
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#define new DBG_NEW
+#endif
+#endif  // _DEBUG
+#endif  // FIND_MEMORY_LEAKS
+
 const float MOUSE_CAMERA_MOVE_SCALE = 0.1f;
 
 DehaxEngine *g_dehaxEngine;
 //Model *g_smallBox;
 //Model *g_bigBox;
 Model *g_objBoxModel;
+Model *g_objMonkeyModel;
 
 bool g_isMousePressed = false;
 POINT g_lastMousePosition;
@@ -59,7 +75,6 @@ bool KeyDown(unsigned int virtualCode)
 	{
 		DirectX::XMFLOAT3 position = g_objBoxModel->getPosition();
 		g_objBoxModel->setPosition(DirectX::XMFLOAT3(position.x - 0.5f, position.y, position.z));
-
 		return true;
 	}
 	break;
@@ -225,6 +240,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+#ifdef FIND_MEMORY_LEAKS
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif  // FIND_MEMORY_LEAKS
+
 	WCHAR szTitle[100];
 	WCHAR szWindowClass[100];
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, 100);
@@ -261,11 +280,14 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 	Material *material = new Material(L"SimpleColor_VS.cso", L"SimpleColor_PS.cso", layout, numElements);
 	g_objBoxModel = new Model(L"..\\cube.obj", DirectX::Colors::GreenYellow, material);
+	Material *material2 = new Material(L"SimpleColor_VS.cso", L"SimpleColor_PS.cso", layout, numElements);
+	g_objMonkeyModel = new Model(L"..\\monkey.obj", DirectX::Colors::Red, material2);
 
 	g_dehaxEngine = new DehaxEngine();
 	//g_dehaxEngine->getScene()->AddModel(g_smallBox);
 	//g_dehaxEngine->getScene()->AddModel(g_bigBox);
 	g_dehaxEngine->getScene()->AddModel(g_objBoxModel);
+	g_dehaxEngine->getScene()->AddModel(g_objMonkeyModel);
 	g_dehaxEngine->getRenderer()->InitDevice(window.getHandle());
 
 	int resultCode = application.Run();

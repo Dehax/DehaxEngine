@@ -10,10 +10,12 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+	//m_objects.clear();
 	unsigned int size = getNumObjects();
 
 	for (unsigned int i = 0; i < size; i++) {
 		delete m_objects[i];
+		m_objects[i] = nullptr;
 	}
 }
 

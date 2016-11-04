@@ -11,6 +11,11 @@ Renderer::Renderer(DehaxEngine *engine)
 
 Renderer::~Renderer()
 {
+	if (m_camera != nullptr) {
+		delete m_camera;
+		m_camera = nullptr;
+	}
+
 	CleanupDevice();
 }
 
@@ -318,6 +323,8 @@ void Renderer::Render()
 		// Установить разметку
 		m_pImmediateContext->IASetInputLayout(m_pVertexLayout);
 
+		m_pVertexLayout->Release();
+
 		char *pPSBlob = material->getPixelShaderBlob();
 		size_t PSSize = material->getPixelShaderSize();
 
@@ -341,6 +348,7 @@ void Renderer::Render()
 		m_pImmediateContext->PSSetConstantBuffers(0, 1, &m_pConstantBuffer);
 		m_pImmediateContext->DrawIndexed(numFaces * 3, 0, 0);
 
+		m_pVertexShader->Release();
 		m_pConstantBuffer->Release();
 	}
 
@@ -372,11 +380,11 @@ Camera *Renderer::getCamera() const
 void Renderer::CleanupDevice()
 {
 	if (m_pImmediateContext) m_pImmediateContext->ClearState();
-	if (m_pConstantBuffer) m_pConstantBuffer->Release();
-	if (m_pVertexBuffer) m_pVertexBuffer->Release();
-	if (m_pIndexBuffer) m_pIndexBuffer->Release();
-	if (m_pVertexLayout) m_pVertexLayout->Release();
-	if (m_pVertexShader) m_pVertexShader->Release();
+	//if (m_pConstantBuffer) m_pConstantBuffer->Release();
+	//if (m_pVertexBuffer) m_pVertexBuffer->Release();
+	//if (m_pIndexBuffer) m_pIndexBuffer->Release();
+	//if (m_pVertexLayout) m_pVertexLayout->Release();
+	//if (m_pVertexShader) m_pVertexShader->Release();
 	if (m_pPixelShader) m_pPixelShader->Release();
 	if (m_pRenderTargetView) m_pRenderTargetView->Release();
 	if (m_pSwapChain1) m_pSwapChain1->Release();

@@ -32,14 +32,17 @@ Material::~Material()
 {
 	if (m_vertexShaderData != nullptr) {
 		delete[] m_vertexShaderData;
+		m_vertexShaderData = nullptr;
 	}
 
 	if (m_pixelShaderData != nullptr) {
 		delete[] m_pixelShaderData;
+		m_pixelShaderData = nullptr;
 	}
 
 	if (m_layout != nullptr) {
 		delete[] m_layout;
+		m_layout = nullptr;
 	}
 }
 

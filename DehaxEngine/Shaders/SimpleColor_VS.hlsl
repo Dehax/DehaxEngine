@@ -17,6 +17,7 @@ struct PS_INPUT
 {
 	float4 Pos : SV_POSITION;
 	float3 Norm : TEXCOORD0;
+	float3 ViewVec : TEXCOORD1;
 };
 
 PS_INPUT VS(VS_INPUT input)
@@ -25,9 +26,7 @@ PS_INPUT VS(VS_INPUT input)
 	output.Pos = mul(input.Pos, World);
 	output.Pos = mul(output.Pos, View);
 	output.Pos = mul(output.Pos, Projection);
-	float4 val = float4(input.Norm, 1);
-	float4 result = mul(val, World);
-	output.Norm = result.xyz;
+	output.Norm = input.Norm;
 
 	return output;
 }

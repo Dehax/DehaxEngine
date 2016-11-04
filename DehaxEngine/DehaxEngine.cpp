@@ -10,10 +10,12 @@ DehaxEngine::~DehaxEngine()
 {
 	if (m_scene != nullptr) {
 		delete m_scene;
+		m_scene = nullptr;
 	}
 
 	if (m_renderer != nullptr) {
 		delete m_renderer;
+		m_renderer = nullptr;
 	}
 }
 
