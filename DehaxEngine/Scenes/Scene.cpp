@@ -5,7 +5,7 @@
 
 Scene::Scene()
 {
-	//CreateAxisModels();
+	CreateAxisModels();
 }
 
 Scene::~Scene()

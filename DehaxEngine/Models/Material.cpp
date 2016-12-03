@@ -5,12 +5,15 @@
 
 Material::Material(const Material &material)
 {
-	m_vertexShaderData = new char[material.m_vertexShaderSize];
-	memcpy(m_vertexShaderData, material.m_vertexShaderData, material.m_vertexShaderSize);
-	m_pixelShaderData = new char[material.m_pixelShaderSize];
-	memcpy(m_pixelShaderData, material.m_pixelShaderData, material.m_pixelShaderSize);
-	m_layout = new D3D11_INPUT_ELEMENT_DESC[material.m_layoutSize];
-	memcpy(m_layout, material.m_layout, sizeof(D3D11_INPUT_ELEMENT_DESC) * material.m_layoutSize);
+	m_vertexShaderSize = material.m_vertexShaderSize;
+	m_vertexShaderData = new char[m_vertexShaderSize];
+	memcpy(m_vertexShaderData, material.m_vertexShaderData, m_vertexShaderSize);
+	m_pixelShaderSize = material.m_pixelShaderSize;
+	m_pixelShaderData = new char[m_pixelShaderSize];
+	memcpy(m_pixelShaderData, material.m_pixelShaderData, m_pixelShaderSize);
+	m_layoutSize = material.m_layoutSize;
+	m_layout = new D3D11_INPUT_ELEMENT_DESC[m_layoutSize];
+	memcpy(m_layout, material.m_layout, sizeof(D3D11_INPUT_ELEMENT_DESC) * m_layoutSize);
 }
 
 Material::Material(LPCWSTR vertexShaderBlobFile, LPCWSTR pixelShaderBlobFile, D3D11_INPUT_ELEMENT_DESC *layout, size_t layoutSize)

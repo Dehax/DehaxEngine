@@ -107,6 +107,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 		sd.SampleDesc.Quality = 0;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = 1;
+		//sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 		hr = dxgiFactory2->CreateSwapChainForHwnd(m_pd3dDevice, hWnd, &sd, nullptr, nullptr, &m_pSwapChain1);
 		if (SUCCEEDED(hr)) {
@@ -129,12 +130,13 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
+		//sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 		hr = dxgiFactory->CreateSwapChain(m_pd3dDevice, &sd, &m_pSwapChain);
 	}
 
 	// Пока не перехватывается полный экран, поэтому блокируем сочетание Alt+Enter
-	dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
+	//dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
 
 	dxgiFactory->Release();
 
@@ -379,6 +381,14 @@ Camera *Renderer::getCamera() const
 
 void Renderer::CleanupDevice()
 {
+	//if (m_pSwapChain1) {
+	//	m_pSwapChain1->SetFullscreenState(FALSE, nullptr);
+	//}
+
+	//if (m_pSwapChain) {
+	//	m_pSwapChain->SetFullscreenState(FALSE, nullptr);
+	//}
+
 	if (m_pImmediateContext) m_pImmediateContext->ClearState();
 	//if (m_pConstantBuffer) m_pConstantBuffer->Release();
 	//if (m_pVertexBuffer) m_pVertexBuffer->Release();
