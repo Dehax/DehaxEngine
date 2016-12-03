@@ -61,14 +61,17 @@
     <ClInclude Include="Models\ModelsFactory.h">
       <Filter>Заголовочные файлы\Models</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\Renderer.h">
-      <Filter>Заголовочные файлы\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer\Camera.h">
       <Filter>Заголовочные файлы\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Models\Material.h">
       <Filter>Заголовочные файлы\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\DX11Renderer.h">
+      <Filter>Заголовочные файлы\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Renderer.h">
+      <Filter>Заголовочные файлы\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -96,14 +99,14 @@
     <ClCompile Include="Models\ModelsFactory.cpp">
       <Filter>Файлы исходного кода\Models</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Renderer.cpp">
-      <Filter>Файлы исходного кода\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Camera.cpp">
       <Filter>Файлы исходного кода\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Models\Material.cpp">
       <Filter>Файлы исходного кода\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\DX11Renderer.cpp">
+      <Filter>Файлы исходного кода\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

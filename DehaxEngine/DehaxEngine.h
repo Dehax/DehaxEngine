@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-#include "Renderer\Renderer.h"
+#include "Renderer\DX11Renderer.h"
 #include "Scenes\Scene.h"
 
 class DEHAXENGINE_API DehaxEngine {

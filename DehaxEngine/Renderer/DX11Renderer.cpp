@@ -1,15 +1,15 @@
 #include "..\stdafx.h"
-#include "Renderer.h"
+#include "DX11Renderer.h"
 
 #include <fstream>
 #include "..\DehaxEngine.h"
 
-Renderer::Renderer(DehaxEngine *engine)
+DX11Renderer::DX11Renderer(DehaxEngine *engine)
 	: m_engine(engine), m_camera(new Camera())
 {
 }
 
-Renderer::~Renderer()
+DX11Renderer::~DX11Renderer()
 {
 	if (m_camera != nullptr) {
 		delete m_camera;
@@ -19,7 +19,7 @@ Renderer::~Renderer()
 	CleanupDevice();
 }
 
-HRESULT Renderer::InitDevice(HWND hWnd)
+HRESULT DX11Renderer::InitDevice(HWND hWnd)
 {
 	HRESULT hr = S_OK;
 
@@ -197,7 +197,7 @@ HRESULT Renderer::InitDevice(HWND hWnd)
 	return S_OK;
 }
 
-void Renderer::Render()
+void DX11Renderer::Render()
 {
 	HRESULT hr = S_OK;
 
@@ -357,29 +357,12 @@ void Renderer::Render()
 	m_pSwapChain->Present(0, 0);
 }
 
-Camera *Renderer::getCamera() const
+Camera *DX11Renderer::getCamera() const
 {
 	return m_camera;
 }
 
-//bool Renderer::LoadShaderFromFile(LPCWSTR lpszFilePath, char **ppBlobOut, size_t &size)
-//{
-//	bool result = true;
-//
-//	std::ifstream shader_file(lpszFilePath, std::ios::in | std::ios::binary | std::ios::ate);
-//	if (shader_file.good()) {
-//		size = (size_t)shader_file.tellg();
-//		*ppBlobOut = new char[size];
-//		shader_file.seekg(0);
-//		shader_file.read(*ppBlobOut, size);
-//	} else {
-//		result = false;
-//	}
-//
-//	return result;
-//}
-
-void Renderer::CleanupDevice()
+void DX11Renderer::CleanupDevice()
 {
 	//if (m_pSwapChain1) {
 	//	m_pSwapChain1->SetFullscreenState(FALSE, nullptr);

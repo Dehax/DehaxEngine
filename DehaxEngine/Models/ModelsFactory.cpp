@@ -18,35 +18,35 @@ Model ModelsFactory::Box(float width, float length, float height)
 	Model model(L"(G) box", mesh, DirectX::Colors::Red, material);
 
 	// +Y
-	mesh->AddVertex(Vertex(-length, height, -width, 0.0f, 1.0f, 0.0f));		// 0
-	mesh->AddVertex(Vertex(length, height, -width, 0.0f, 1.0f, 0.0f));		// 1
-	mesh->AddVertex(Vertex(length, height, width, 0.0f, 1.0f, 0.0f));		// 2
-	mesh->AddVertex(Vertex(-length, height, width, 0.0f, 1.0f, 0.0f));		// 3
+	(*mesh) += Vertex(-length, height, -width, 0.0f, 1.0f, 0.0f);		// 0
+	(*mesh) += Vertex(length, height, -width, 0.0f, 1.0f, 0.0f);		// 1
+	(*mesh) += Vertex(length, height, width, 0.0f, 1.0f, 0.0f);			// 2
+	(*mesh) += Vertex(-length, height, width, 0.0f, 1.0f, 0.0f);		// 3
 	// -Y
-	mesh->AddVertex(Vertex(-length, -height, -width, 0.0f, -1.0f, 0.0f));	// 4
-	mesh->AddVertex(Vertex(length, -height, -width, 0.0f, -1.0f, 0.0f));	// 5
-	mesh->AddVertex(Vertex(length, -height, width, 0.0f, -1.0f, 0.0f));		// 6
-	mesh->AddVertex(Vertex(-length, -height, width, 0.0f, -1.0f, 0.0f));	// 7
+	(*mesh) += Vertex(-length, -height, -width, 0.0f, -1.0f, 0.0f);		// 4
+	(*mesh) += Vertex(length, -height, -width, 0.0f, -1.0f, 0.0f);		// 5
+	(*mesh) += Vertex(length, -height, width, 0.0f, -1.0f, 0.0f);		// 6
+	(*mesh) += Vertex(-length, -height, width, 0.0f, -1.0f, 0.0f);		// 7
 	// -X
-	mesh->AddVertex(Vertex(-length, -height, width, -1.0f, 0.0f, 0.0f));	// 0
-	mesh->AddVertex(Vertex(-length, -height, -width, -1.0f, 0.0f, 0.0f));	// 1
-	mesh->AddVertex(Vertex(-length, height, -width, -1.0f, 0.0f, 0.0f));	// 2
-	mesh->AddVertex(Vertex(-length, height, width, -1.0f, 0.0f, 0.0f));		// 3
+	(*mesh) += Vertex(-length, -height, width, -1.0f, 0.0f, 0.0f);		// 0
+	(*mesh) += Vertex(-length, -height, -width, -1.0f, 0.0f, 0.0f);		// 1
+	(*mesh) += Vertex(-length, height, -width, -1.0f, 0.0f, 0.0f);		// 2
+	(*mesh) += Vertex(-length, height, width, -1.0f, 0.0f, 0.0f);		// 3
 	// +X
-	mesh->AddVertex(Vertex(length, -height, width, 1.0f, 0.0f, 0.0f));		// 0
-	mesh->AddVertex(Vertex(length, -height, -width, 1.0f, 0.0f, 0.0f));		// 1
-	mesh->AddVertex(Vertex(length, height, -width, 1.0f, 0.0f, 0.0f));		// 2
-	mesh->AddVertex(Vertex(length, height, width, 1.0f, 0.0f, 0.0f));		// 3
+	(*mesh) += Vertex(length, -height, width, 1.0f, 0.0f, 0.0f);		// 0
+	(*mesh) += Vertex(length, -height, -width, 1.0f, 0.0f, 0.0f);		// 1
+	(*mesh) += Vertex(length, height, -width, 1.0f, 0.0f, 0.0f);		// 2
+	(*mesh) += Vertex(length, height, width, 1.0f, 0.0f, 0.0f);			// 3
 	// -Z
-	mesh->AddVertex(Vertex(-length, -height, -width, 0.0f, 0.0f, -1.0f));	// 0
-	mesh->AddVertex(Vertex(length, -height, -width, 0.0f, 0.0f, -1.0f));	// 1
-	mesh->AddVertex(Vertex(length, height, -width, 0.0f, 0.0f, -1.0f));		// 2
-	mesh->AddVertex(Vertex(-length, height, -width, 0.0f, 0.0f, -1.0f));	// 3
+	(*mesh) += Vertex(-length, -height, -width, 0.0f, 0.0f, -1.0f);		// 0
+	(*mesh) += Vertex(length, -height, -width, 0.0f, 0.0f, -1.0f);		// 1
+	(*mesh) += Vertex(length, height, -width, 0.0f, 0.0f, -1.0f);		// 2
+	(*mesh) += Vertex(-length, height, -width, 0.0f, 0.0f, -1.0f);		// 3
 	// +Z
-	mesh->AddVertex(Vertex(-length, -height, width, 0.0f, 0.0f, 1.0f));		// 0
-	mesh->AddVertex(Vertex(length, -height, width, 0.0f, 0.0f, 1.0f));		// 1
-	mesh->AddVertex(Vertex(length, height, width, 0.0f, 0.0f, 1.0f));		// 2
-	mesh->AddVertex(Vertex(-length, height, width, 0.0f, 0.0f, 1.0f));		// 3
+	(*mesh) += Vertex(-length, -height, width, 0.0f, 0.0f, 1.0f);		// 0
+	(*mesh) += Vertex(length, -height, width, 0.0f, 0.0f, 1.0f);		// 1
+	(*mesh) += Vertex(length, height, width, 0.0f, 0.0f, 1.0f);			// 2
+	(*mesh) += Vertex(-length, height, width, 0.0f, 0.0f, 1.0f);		// 3
 
 	mesh->AddFace(DirectX::XMUINT3(3, 1, 0));
 	mesh->AddFace(DirectX::XMUINT3(2, 1, 3));

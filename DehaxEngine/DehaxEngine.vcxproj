@@ -149,6 +149,7 @@
     <ClInclude Include="Models\ModelsFactory.h" />
     <ClInclude Include="Models\Vertex.h" />
     <ClInclude Include="Renderer\Camera.h" />
+    <ClInclude Include="Renderer\DX11Renderer.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Scenes\Scene.h" />
     <ClInclude Include="stdafx.h" />
@@ -206,7 +207,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="Renderer\Renderer.cpp">
+    <ClCompile Include="Renderer\DX11Renderer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\stdafx.h</PrecompiledHeaderFile>

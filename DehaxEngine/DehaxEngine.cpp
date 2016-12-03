@@ -2,7 +2,7 @@
 #include "DehaxEngine.h"
 
 DehaxEngine::DehaxEngine()
-	: m_renderer(new Renderer(this)), m_scene(new Scene())
+	: m_renderer(new DX11Renderer(this)), m_scene(new Scene())
 {
 }
 

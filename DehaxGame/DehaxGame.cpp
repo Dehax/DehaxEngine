@@ -190,7 +190,7 @@ bool KeyDown(unsigned int virtualCode)
 		wchar_t currentDirectoryPath[MAX_PATH];
 		GetCurrentDirectoryW(MAX_PATH, currentDirectoryPath);
 
-		bool isOpened = GetOpenFileNameW(&ofn);
+		BOOL isOpened = GetOpenFileNameW(&ofn);
 
 		SetCurrentDirectoryW(currentDirectoryPath);
 
@@ -283,7 +283,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 		LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_SMALL)),
 		LoadCursorW(nullptr, IDC_ARROW),
 		(HBRUSH)(COLOR_WINDOW + 1),
-		MAKEINTRESOURCEW(IDC_DEHAXGAME),
+		/*MAKEINTRESOURCEW(IDC_DEHAXGAME)*/nullptr,
 		szWindowClass,
 		szTitle);
 	window.setKeyDownHandler(KeyDown);
